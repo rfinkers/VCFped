@@ -33,7 +33,7 @@ import os
 import argparse
 from tabulate import tabulate
 
-import checkped
+from . import checkped
 
 # Hard coding coordinates of pseudo-autosomal regions on X (hg19)
 _PAR1_ = (60000, 2699521)
@@ -49,9 +49,9 @@ def XminusPAR(linesplit, chromcol):
   
 def _writeout(txt, log, quiet=False):
     if log:
-        print >> log, txt
+        print(txt, file=log)
     if not quiet:
-        print txt
+        print(txt)
     
 def inspectFile(filename, log, quiet=False):
     _writeout("\n====FILE INFO====", log, quiet)
@@ -114,7 +114,7 @@ def inspectFile(filename, log, quiet=False):
         # Estimating the number of variants: If less than 2000, report exactly
         linecount = None
         skipsize = 2000
-        for i in xrange(skipsize-1): 
+        for i in range(skipsize-1): 
             if f.readline() == '':
                 linecount = i
                 break
@@ -191,7 +191,7 @@ class Filter(object):
                         if DPtest and int(spl[DPind]) < DPmin: return 0
                         if GQtest and int(spl[GQind]) < GQmin: return 0
                         if ADtest and spl[0][0] != spl[0][2]: # if heterozygot
-                            ad = map(float, spl[ADind].split(','))
+                            ad = list(map(float, spl[ADind].split(',')))
                             if not ADlow <= ad[1]/(ad[0]+ad[1]) <= ADhigh:
                                 return 0
                 return 1
@@ -229,8 +229,8 @@ def all_variants(file, info, log, quiet):
                     AABB += 1
     
     if log or not quiet:
-        AUTant = sum(len(v) for v in AUTOSOM.values())
-        Xant = sum(len(v) for v in XCHR.values())
+        AUTant = sum(len(v) for v in list(AUTOSOM.values()))
+        Xant = sum(len(v) for v in list(XCHR.values()))
         summary = 'Using all PASS variants:\n %d autosomal (including %d with AA+BB)\n %d X-linked.'%(AUTant, AABB, Xant)
         _writeout(summary, log, quiet)
     
@@ -254,7 +254,7 @@ def sample_variants(file, maxsize, AABBsize, Xsize, info, log, quiet, chunks=4):
             f.seek(_randpos())
             f.readline() # Skip current line (because we might be in the middle of a line)
         
-            for _ in xrange(chunks):
+            for _ in range(chunks):
                 line = f.readline()
                 while line and 'PASS' not in line:  # avoiding EOF infinite loop
                     line = f.readline()
@@ -280,7 +280,7 @@ def sample_variants(file, maxsize, AABBsize, Xsize, info, log, quiet, chunks=4):
         
 def qualityDistrib(variantlines, formatinfo, variables=['QUAL', 'DP', 'GQ', 'AD']):
     if isinstance(variantlines, dict):
-        variantlines = itertools.chain(*variantlines.values())
+        variantlines = itertools.chain(*list(variantlines.values()))
     useVariables = [v for v in formatinfo['available_vars'] if v in variables]
     ADind = formatinfo['ADind'] if 'AD' in useVariables else None
     DPind = formatinfo['DPind'] if 'DP' in useVariables else None
@@ -290,7 +290,7 @@ def qualityDistrib(variantlines, formatinfo, variables=['QUAL', 'DP', 'GQ', 'AD'
     distrib_data = collections.defaultdict(list)
     
     def _ALTratio(ADfield):
-        ad0, ad1 = map(float, ADfield.split(','))
+        ad0, ad1 = list(map(float, ADfield.split(',')))
         rat = ad1/(ad0+ad1)
         return round(min(rat, 1-rat) * 100, 1)
     
@@ -321,9 +321,9 @@ def qualityDistrib(variantlines, formatinfo, variables=['QUAL', 'DP', 'GQ', 'AD'
     
 def qualityPercentile(distrib_data, p, log, quiet):
     if isinstance(p, list):
-        res = {key : [data[int(pp/100.0*len(data))] for pp in p] for key,data in distrib_data.iteritems()}
+        res = {key : [data[int(pp/100.0*len(data))] for pp in p] for key,data in distrib_data.items()}
     else:
-        res = {key : data[int(p/100.0*len(data))] for key,data in distrib_data.iteritems()}
+        res = {key : data[int(p/100.0*len(data))] for key,data in distrib_data.items()}
         
     if log or not quiet:
         _writeout("\n====SCORE PERCENTILES (%s)====" % ", ".join(map(str, p)), log, quiet)
@@ -338,7 +338,7 @@ def checkTriple(AUTOSOMfilt, triple, percentile, T1_thresh, T2_thresh):
     
     distr = collections.Counter()
     g = operator.itemgetter(*triple)
-    for k,v in AUTOSOMfilt.iteritems():
+    for k,v in AUTOSOMfilt.items():
         if '-' in g(k): continue
         distr[g(k)] += len(v)
     SURV = sum(distr.values()) 
@@ -376,7 +376,7 @@ def checkPair(AUTOSOMfilt, pair, percentile, MZ_thresh=95, PO_thresh=99):
     testresults = []
     distr = collections.Counter()
     g = operator.itemgetter(*pair)
-    for k,v in AUTOSOMfilt.iteritems():
+    for k,v in AUTOSOMfilt.items():
         if '-' in g(k): continue
         distr[g(k)] += len(v)
     autos_total = sum(distr.values()) 
@@ -406,7 +406,7 @@ def inferGenders(XCHRfilt, formatinfo, percentile, FEMALE_thresh, MALE_thresh):
     nSamples = formatinfo['nSamples']
     Xdistribs = [collections.Counter() for _ in range(nSamples)]
     Xtot = 0
-    for gtcomb, lines in XCHRfilt.iteritems():
+    for gtcomb, lines in XCHRfilt.items():
         nvars = len(lines)
         Xtot += nvars
         for i, gt in enumerate(gtcomb):
@@ -603,20 +603,20 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
 
     autosom_filt = AUTOSOM.copy()
     x_filt = XCHR.copy()
-    triples = list(itertools.combinations(range(nSamples), 3))
-    pairs = list(itertools.combinations(range(nSamples), 2))
+    triples = list(itertools.combinations(list(range(nSamples)), 3))
+    pairs = list(itertools.combinations(list(range(nSamples)), 2))
      
     TRIORES, PAIRRES, GENDERRES = [], [], []
     for p in percentiles:
         qualperc = qualityPercentile(qualdist, p, log=None, quiet=True)
-        filterargs = {key+'min':val for key,val in qualperc.iteritems()}
+        filterargs = {key+'min':val for key,val in qualperc.items()}
         filterObject = Filter(formatinfo=info, PASS=True, **filterargs)
         filterFUN = filterObject.filter()
         
-        autosom_filt = {k:filter(filterFUN, v) for k,v in autosom_filt.iteritems()}
-        x_filt = {k:filter(filterFUN, v) for k,v in x_filt.iteritems()}
+        autosom_filt = {k:list(filter(filterFUN, v)) for k,v in autosom_filt.items()}
+        x_filt = {k:list(filter(filterFUN, v)) for k,v in x_filt.items()}
         
-        N = sum(len(v) for v in autosom_filt.values()) 
+        N = sum(len(v) for v in list(autosom_filt.values())) 
         
         if N == 0: break #raise RuntimeError("No variants surviving filter.")
 

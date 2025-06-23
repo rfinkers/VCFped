@@ -37,7 +37,7 @@ def checkped(pedfile, bestG, bestP, bestT, info):
     if set(samples) != set(ped['sampleset']): 
         raise RuntimeError("Sample names don't match pedfile ID's.\nVariant file: %s\nPedfile: %s" %(samples, ped['sampleset']))
     
-    bestTdict = dict(zip(*bestT))
+    bestTdict = dict(list(zip(*bestT)))
     pivot = bestTdict['Pivot']
     if not bestTdict['Verdict'] == "Regular trio":
         raise RuntimeError("This is not recognized as a regular trio. Check output files for details.")
@@ -66,4 +66,4 @@ def checkped(pedfile, bestG, bestP, bestT, info):
     
     
 if __name__ == '__main__':
-    print readped("testfiles/trio.ped")
+    print(readped("testfiles/trio.ped"))
