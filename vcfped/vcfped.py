@@ -32,8 +32,9 @@ import sys
 import os
 import argparse
 from tabulate import tabulate
+import multiprocessing
 
-from . import checkped
+import checkped
 
 # Hard coding coordinates of pseudo-autosomal regions on X (hg19)
 _PAR1_ = (60000, 2699521)
@@ -525,6 +526,14 @@ def bestGenders(genderdata):
     
     return gender_table(best)
         
+def checkPair_worker(args):
+    autosom_filt, pair, percentile, MZ_thresh, PO_thresh = args
+    return checkPair(autosom_filt, pair, percentile, MZ_thresh, PO_thresh)
+
+def checkTriple_worker(args):
+    autosom_filt, triple, percentile, T1_thresh, T2_thresh = args
+    return checkTriple(autosom_filt, triple, percentile, T1_thresh, T2_thresh)
+
 def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP','GQ','AD'], percentiles=[10,30,50], 
            T1_thresh=90, T2_thresh=95, MZ_thresh=95, PO_thresh=99, MALE_thresh=5, FEMALE_thresh=25, pedfile=None,
            nogender=False, nopairwise=False, notrio=False, exactmax=150000, samplesize=10000, samplesizeAABB=500):
@@ -605,37 +614,38 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     x_filt = XCHR.copy()
     triples = list(itertools.combinations(list(range(nSamples)), 3))
     pairs = list(itertools.combinations(list(range(nSamples)), 2))
-     
-    TRIORES, PAIRRES, GENDERRES = [], [], []
-    for p in percentiles:
-        qualperc = qualityPercentile(qualdist, p, log=None, quiet=True)
-        filterargs = {key+'min':val for key,val in qualperc.items()}
-        filterObject = Filter(formatinfo=info, PASS=True, **filterargs)
-        filterFUN = filterObject.filter()
-        
-        autosom_filt = {k:list(filter(filterFUN, v)) for k,v in autosom_filt.items()}
-        x_filt = {k:list(filter(filterFUN, v)) for k,v in x_filt.items()}
-        
-        N = sum(len(v) for v in list(autosom_filt.values())) 
-        
-        if N == 0: break #raise RuntimeError("No variants surviving filter.")
 
-        #### GENDERS ###
-        if not nogender:
-            genders = inferGenders(x_filt, info, percentile=p, FEMALE_thresh=FEMALE_thresh, MALE_thresh=MALE_thresh)
-            GENDERRES.extend(genders)
+    TRIORES, PAIRRES, GENDERRES = [], [], []
+
+    # Create the pool ONCE
+    with multiprocessing.Pool(processes=32) as pool:
+        for p in percentiles:
+            qualperc = qualityPercentile(qualdist, p, log=None, quiet=True)
+            filterargs = {key+'min':val for key,val in qualperc.items()}
+            filterObject = Filter(formatinfo=info, PASS=True, **filterargs)
+            filterFUN = filterObject.filter()
             
-        #### PAIRWISE ###
-        if not nopairwise:
-            for pair in pairs:
-                testres = checkPair(autosom_filt, pair, percentile=p, MZ_thresh=MZ_thresh, PO_thresh=PO_thresh)
-                PAIRRES.append(testres)
+            autosom_filt = {k:list(filter(filterFUN, v)) for k,v in autosom_filt.items()}
+            x_filt = {k:list(filter(filterFUN, v)) for k,v in x_filt.items()}
             
-        #### TRIOS ###
-        if not notrio:
-            for triple in triples:
-                testres = checkTriple(autosom_filt, triple, percentile=p, T1_thresh=T1_thresh, T2_thresh=T2_thresh)
-                TRIORES.extend(testres)
+            N = sum(len(v) for v in list(autosom_filt.values())) 
+            
+            if N == 0: break
+
+            #### GENDERS ###
+            if not nogender:
+                genders = inferGenders(x_filt, info, percentile=p, FEMALE_thresh=FEMALE_thresh, MALE_thresh=MALE_thresh)
+                GENDERRES.extend(genders)
+                
+            #### PAIRWISE ###
+            if not nopairwise:
+                pair_args = [(autosom_filt, pair, p, MZ_thresh, PO_thresh) for pair in pairs]
+                PAIRRES.extend(pool.map(checkPair_worker, pair_args))
+            #### TRIOS ###
+            if not notrio:
+                triple_args = [(autosom_filt, triple, p, T1_thresh, T2_thresh) for triple in triples]
+                for res in pool.map(checkTriple_worker, triple_args):
+                    TRIORES.extend(res)
     
     GENDERRES.sort(key=lambda x: (x['sample'], x['percentile']))
     PAIRRES.sort(key=lambda x: (x['pair'], x['percentile']))
@@ -760,4 +770,3 @@ def main():
     
 if __name__ == '__main__':
     main()
-    
