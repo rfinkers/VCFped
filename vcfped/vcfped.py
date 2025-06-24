@@ -33,12 +33,32 @@ import os
 import argparse
 from tabulate import tabulate
 import multiprocessing
-
 import checkped
+import tqdm
 
 # Hard coding coordinates of pseudo-autosomal regions on X (hg19)
 _PAR1_ = (60000, 2699521)
 _PAR2_ = (154931043, 155270561)
+
+
+def do_work(x):
+    time.sleep(x)
+    return x
+
+
+def progress():
+    time.sleep(3)  # Check progress after 3 seconds
+    print(f'total: {pbar.total} finish:{pbar.n}')
+
+
+def chunked_iterable(iterable, size):
+    it = iter(iterable)
+    while True:
+        chunk = list(itertools.islice(it, size))
+        if not chunk:
+            break
+        yield chunk
+
 
 def XminusPAR(linesplit, chromcol):
     ''' Determine if a variant is on X outside PARs.'''
@@ -615,10 +635,12 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     triples = list(itertools.combinations(list(range(nSamples)), 3))
     pairs = list(itertools.combinations(list(range(nSamples)), 2))
 
-    TRIORES, PAIRRES, GENDERRES = [], [], []
+    # Define generators for pairs and triples
+    pairs_gen = lambda: itertools.combinations(range(nSamples), 2)
+    triples_gen = lambda: itertools.combinations(range(nSamples), 3)
 
-    # Create the pool ONCE
-    with multiprocessing.Pool(processes=32) as pool:
+    TRIORES, PAIRRES, GENDERRES = [], [], []
+    with multiprocessing.Pool(processes=16) as pool:  # Adjust number of processes as needed
         for p in percentiles:
             qualperc = qualityPercentile(qualdist, p, log=None, quiet=True)
             filterargs = {key+'min':val for key,val in qualperc.items()}
@@ -628,7 +650,7 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
             autosom_filt = {k:list(filter(filterFUN, v)) for k,v in autosom_filt.items()}
             x_filt = {k:list(filter(filterFUN, v)) for k,v in x_filt.items()}
             
-            N = sum(len(v) for v in list(autosom_filt.values())) 
+            N = sum(len(v) for v in autosom_filt.values()) 
             
             if N == 0: break
 
@@ -638,14 +660,21 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
                 GENDERRES.extend(genders)
                 
             #### PAIRWISE ###
+            pbar = tqdm(total= nSamples * (nSamples - 1) // 2)
             if not nopairwise:
-                pair_args = [(autosom_filt, pair, p, MZ_thresh, PO_thresh) for pair in pairs]
-                PAIRRES.extend(pool.map(checkPair_worker, pair_args))
+                for pair_chunk in chunked_iterable(pairs_gen(), 10000):
+                    pair_args = [(autosom_filt, pair, p, MZ_thresh, PO_thresh) for pair in pair_chunk]
+                    PAIRRES.extend(pool.map(checkPair_worker, pair_args))
+                    pbar.update(1)
+                
             #### TRIOS ###
+            pbar = tqdm(total= nSamples * (nSamples - 1) * (nSamples - 2) // 6)
             if not notrio:
-                triple_args = [(autosom_filt, triple, p, T1_thresh, T2_thresh) for triple in triples]
-                for res in pool.map(checkTriple_worker, triple_args):
-                    TRIORES.extend(res)
+                for triple_chunk in chunked_iterable(triples_gen(), 10000):
+                    triple_args = [(autosom_filt, triple, p, T1_thresh, T2_thresh) for triple in triple_chunk]
+                    for res in pool.map(checkTriple_worker, triple_args):
+                        TRIORES.extend(res)
+                        pbar.update(1)
     
     GENDERRES.sort(key=lambda x: (x['sample'], x['percentile']))
     PAIRRES.sort(key=lambda x: (x['pair'], x['percentile']))
