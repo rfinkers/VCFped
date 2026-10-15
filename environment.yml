@@ -1,0 +1,65 @@
+name: vcfped
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+
+  # ── Core vcfped dependency (required) ───────────────────────────────────────
+  - tabulate
+
+  # ── vcfped_optimized.py: numpy is a HARD dependency (the genotype matrix
+  #    is numpy-vectorized throughout — not an optional accelerator, unlike
+  #    numba/tqdm below which DO have real try/except graceful fallback).
+  #    vcfped.py (the reference implementation) does not need numpy at all.
+  - numpy
+  - numba
+  - tqdm
+
+  # ── Used by utilities/fixed_pedigree_viz.py, plot_vcfped_pedigree.py,
+  #    analyze_vcfped_pairs.py
+  - pandas
+  - plotly
+
+  # ── Test suite ───────────────────────────────────────────────────────────────
+  - pytest
+
+  # ── External tools for pedigree verification (see PEDIGREE_VERIFICATION.md) ─
+  - plink2                # utilities/prepare_plink_beagle.py _run_plink.sh
+  - beagle                # utilities/prepare_plink_beagle.py _run_beagle.sh (phasing)
+  - king                  # alternative/complement to PLINK2 KING (PEDIGREE_VERIFICATION.md)
+  - bcftools               # VCF subsetting, chromosome handling
+  - htslib                 # provides tabix, used to index phased/subset VCFs
+
+  # ── R, for the auto-generated IBD/HBD summary scripts (*_ibd_summary.R etc.) ─
+  - r-base
+  - r-data.table
+  - r-r.utils                # required by data.table::fread to read .gz files directly
+  - r-ggplot2               # optional: IBD block visualisation (PEDIGREE_VERIFICATION.md)
+
+  # ── Install vcfped itself (editable, matches `pip install -e .` in CLAUDE.md) ─
+  - pip
+  - pip:
+      - -e .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NOTES
+# ─────────────────────────────────────────────────────────────────────────────
+# hap-IBD is NOT available via conda/bioconda. Download the jar manually:
+#   wget https://faculty.washington.edu/browning/hap-ibd.jar
+# Then either run it with `java -jar hap-ibd.jar ...` directly, or build a
+# wrapper script named `hap-ibd` on your PATH so it can be invoked as a
+# bare command (matching the --hapibd default in prepare_plink_beagle.py):
+#   #!/usr/bin/env bash
+#   exec java -Xmx16g -jar /path/to/hap-ibd.jar "$@"
+#
+# beagle (bioconda) installs a `beagle` wrapper script; if you instead use a
+# manually downloaded beagle.jar, pass --beagle "java -Xmx16g -jar beagle.jar"
+# to prepare_plink_beagle.py.
+#
+# Create the environment:
+#   conda env create -f environment.yml
+#   conda activate vcfped
+#
+# Or with mamba (faster solver):
+#   mamba env create -f environment.yml
