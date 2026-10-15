@@ -19,22 +19,49 @@ Other knobs: `--n-samples`, `--n-duplicates`, `--error-rate`, `--missing-rate`,
 `--n-bad-markers`, `--fst`, `--interference-nu`, `--min-ibd-cm`.
 `pytest tests/test_generate_breeding_sim.py` checks the generator (21 tests, ~15 s).
 
-## Running the pipeline on it
+## Running and scoring the pipeline
+
+One script runs the pipeline stages from `CLAUDE.md` and scores the result against the truth:
 
 ```bash
-V=vcfped/testfiles/breeding_sim/breeding_sim.vcf.gz     # or .vcf for vcfped.py
-python -m vcfped.vcfped_optimized $V --no-trio --no-gender -o step1      # duplicates
-python utilities/purge_mz_twins.py $V step1.pair -o sim_no_mz.vcf.gz
-python -m vcfped.vcfped_optimized sim_no_mz.vcf.gz --no-pairwise --no-gender -o step3
+utilities/run_validation_pipeline.sh -o runs/seed42 -j 10
 ```
 
-then continue with Stages 3–6 of the "Full workflow" in `CLAUDE.md` (rename, `filter_trios.py`,
-`prepare_plink_beagle.py … --chr-prefix ch`, PLINK2/BEAGLE, `refine_pedigree.py`,
-`extend_pedigree.py`). `ch01…ch20` matches `--chr-prefix ch` and the `--chr-set 20` in the
-generated PLINK script. Note that `purge_mz_twins.py` removes the clones from the VCF, so
-duplicates must be looked up in `_truth_duplicates.tsv` when scoring.
-The true genetic map can replace the synthetic uniform map in `_run_beagle.sh`
-(`MAP=`); its chromosome names are `ch01…` like the VCF.
+Stages run in order (`pairs, purge, trios, filter, plink, beagle, refine, qc, score`), each logging to
+`OUTDIR/logs/<stage>.log`, and each is skipped on rerun if already done (`--force` to redo,
+`--stages a,b` to pick). Environment: `PYTHON`, `PLINK2`, and, to include phasing and IBD,
+`BEAGLE_CMD="java -Xmx16g -jar beagle.jar"` and `HAPIBD_CMD="java -Xmx16g -jar hap-ibd.jar"`.
+With those set, `--true-map` gives hap-IBD the true genetic map instead of the uniform synthetic
+one, and `--hapibd-min-markers` (default 10) replaces hap-IBD's default of 100. If the plink2 in
+use rejects `--mendel`, the runner reruns the generated script with that step replaced and the
+Mendel scoring is skipped. The trio stage dominates the run time (about 40 minutes for the 500
+samples with numba and 9 workers; its result writing is single-process, so more workers help little).
+
+The scorer also works on its own, on whatever you have; every input switches on one section:
+
+```bash
+python utilities/score_against_truth.py --truth vcfped/testfiles/breeding_sim/breeding_sim \
+    --samples breeding_sim.vcf.gz --pair step1_named.pair --purge-log purge.log \
+    --trio step3_named.trio --fam step3_named_filtered_refined.fam --king step3_named_filtered_king_ext.kin0 \
+    --ibd step3_named_filtered_ibd.ibd.gz --hbd step3_named_filtered_ibd.hbd.gz -o score
+```
+
+It prints a report and writes `score_score_report.txt`, `score_score_summary.json` (for comparing runs
+or seeds) and `score_score_children.tsv` (one row per true child, with the outcome in each stage).
+What it scores:
+
+| Section | Input | Reports |
+|---|---|---|
+| Duplicate purge | `--purge-log` | removals that were true duplicates; **distinct individuals wrongly removed and lost** |
+| Pairwise verdicts | `--pair` | MZ and parent-child calls vs truth; false MZ calls split by inbreeding |
+| Trio stage | `--trio` | per truth kind (simple, inbred child, related parents, backcross): unique / ambiguous / wrong / inverted-only / missed / lost-by-purge; precision |
+| Final pedigree | `--fam` | per truth kind: correct / partial / wrong / unassigned, spurious parents, what wrongly assigned parents truly are, per scenario |
+| KING | `--king` | per true relationship: listed, in the correct degree band; extra pairs; PO vs full-sib IBS0 |
+| Quality plants | `--genotype-quality`, `--mendel-individual`, `--mendel-artifacts` | planted low-call-rate, contaminated and high-error samples and bad markers found |
+| IBD / HBD | `--ibd`, `--hbd` (repeatable) | coverage of true IBD per relationship, false pairs, hotspot block; per-sample HBD correlation |
+
+Denominators use the original sample set, so anything the purge removes wrongly counts as a
+miss. Test it on a subset of families with `--samples subset.vcf`.
 
 ## What is in the cohort
 
@@ -98,6 +125,8 @@ F > 0.9 (deeply selfed lines).
 
 ## Scoring a reconstruction against the truth
 
+`utilities/score_against_truth.py` does all of this (see above); the rules it follows:
+
 * **Compare parent sets, not slots.** Which hermaphrodite is `PAT` vs `MAT` is a coin flip per
   cross, and vcfped's trio output is unordered.
 * **Duplicates are interchangeable.** If X has a clone X′, either is a correct parent of X's
@@ -138,9 +167,9 @@ then lists 1 613 pairs.
   a partially inbred member (F ≥ 0.125). Pairs involving inbred individuals are systematically
   *under*-estimated by KING-robust (e.g. full sibs with `COMPLEX=Y`: median KING 0.16 vs ~0.45
   expected).
-* 254 of the 124 750 pairs with **no pedigree relationship at all** appear in the table, all at
-  0.044–0.088: structure among the three founder pools plus sampling noise. Lower `--fst`
-  (e.g. `--fst 0`) for a cleaner background.
+* 254 of the 124 750 pairs that are not in the truth relationships table appear in KING's table, all at
+  0.044–0.088; 252 of them share no true IBD at all (structure among the three founder pools plus
+  sampling noise), 2 are distant relatives. Lower `--fst` (e.g. `--fst 0`) for a cleaner background.
 
 ### vcfped's own pairwise stage
 
@@ -174,8 +203,14 @@ Measured on a 139-sample / 17-family subset (the full 500-sample trio stage did 
 | 2000 (`--snps-per-chr 100`) | 52 (3 with extra candidate pairs) | 0 | 0 | 1 |
 | 3000 (default) | 52 (4 with extra candidate pairs) | 0 | 0 | 2 |
 
-The backcross and related-parent trios are never `Regular trio`; they are the cases this dataset
-exists to expose. One seed, one subset.
+The backcross and related-parent trios are never `Regular trio`, and the reason is structural, not
+a matter of marker count. Test 1 counts sites where the two parents are opposite homozygotes, and
+the two parents of a backcross child are themselves parent and offspring, so there are almost none
+(median over the 34 backcross trios: 5, maximum 17; related parents: median 34, maximum 96; simple
+trios: median 252, minimum 205). Against the floor of 100 they produce no trio row at all, not even
+an inverted one. If these relationships are to be found, KING and IBD have to find them
+(`refine_pedigree.py --include-inverted`, `extend_pedigree.py`); the scorer shows whether they do.
+One seed, one subset.
 
 ## Limitations
 
