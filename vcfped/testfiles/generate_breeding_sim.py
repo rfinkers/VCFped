@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Simulate a plant-breeding validation cohort for VCFped: ~500 diploid samples,
-1000 SNPs on 20 chromosomes, many small multi-generation pedigrees, duplicates,
+3000 SNPs on 20 chromosomes, many small multi-generation pedigrees, duplicates,
 genotyping error -- plus phased ground truth in PLINK/BEAGLE/hap-IBD formats.
 
 DESIGN (see breeding_sim/README.md for the literature behind each choice)
@@ -39,8 +39,8 @@ Outputs (<out-dir>/, prefix breeding_sim)
 
 Usage
 -----
-  python generate_breeding_sim.py                    # seed 42, 500 samples x 1000 SNPs
-  python generate_breeding_sim.py --seed 7 --snps-per-chr 200
+  python generate_breeding_sim.py                    # seed 42, 500 samples x 3000 SNPs
+  python generate_breeding_sim.py --seed 7 --snps-per-chr 50   # sparse: 1000 SNPs
 """
 
 import argparse
@@ -663,7 +663,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--n-chr", type=int, default=20)
-    ap.add_argument("--snps-per-chr", type=int, default=50, help="default 50 -> 1000 SNPs")
+    ap.add_argument("--snps-per-chr", type=int, default=150,
+                    help="default 150 -> 3000 SNPs. vcfped's trio test needs >= 100 informative "
+                         "sites per trio; 50 (1000 SNPs) is below that floor")
     ap.add_argument("--n-samples", type=int, default=500, help="VCF columns incl. duplicates")
     ap.add_argument("--n-duplicates", type=int, default=30, help="clone samples among them")
     ap.add_argument("--error-rate", type=float, default=0.003, help="per-genotype miscall rate")

@@ -220,8 +220,8 @@ def samples_tsv(sim_dir):
 
 def test_cohort_dimensions(sim_dir, vcfs):
     samples, fixed, obs, truth = vcfs
-    assert len(samples) == 500 and obs.shape == (500, 1000)
-    assert collections.Counter(r[0] for r in fixed) == {f'ch{c:02d}': 50 for c in range(1, 21)}
+    assert len(samples) == 500 and obs.shape == (500, 3000)
+    assert collections.Counter(r[0] for r in fixed) == {f'ch{c:02d}': 150 for c in range(1, 21)}
     gz_samples, gz_fixed, _ = _load_vcf(_path(sim_dir, '.vcf.gz'))
     assert gz_samples == samples and gz_fixed == fixed
 
@@ -290,7 +290,7 @@ def test_planted_quality_problems(sim_dir, vcfs, samples_tsv):
     assert np.mean([(obs[i] < 0).mean() for i in by['low_callrate']]) > 0.08
     snps = _tsv(_path(sim_dir, '_truth_snps.tsv'))
     bad = [j for j, r in enumerate(snps) if r['BAD_MARKER'] == 'Y']
-    good = [j for j in range(1000) if j not in set(bad)]
+    good = [j for j in range(truth.shape[1]) if j not in set(bad)]
     err = lambda cols: ((obs[:, cols] != truth[:, cols]) & (obs[:, cols] >= 0)).sum() / (obs[:, cols] >= 0).sum()
     assert len(bad) == 8 and err(bad) > 0.10 and err(good) < 0.01
     normal = [i for i, s in enumerate(samples) if not (flags[s] & {'low_callrate', 'high_error', 'contaminated'})]
@@ -321,6 +321,28 @@ def test_edge_case_coverage(sim_dir, samples_tsv):
     assert max(float(r['F_PED']) for r in genotyped) > 0.9        # deeply selfed lines
     assert max(int(r['GENERATION']) for r in genotyped) >= 5      # several generations deep
     assert collections.Counter(r['FID'] for r in genotyped).most_common(1)[0][1] >= 12
+
+
+def test_simple_trios_clear_vcfped_informative_site_floor(sim_dir, vcfs):
+    """
+    vcfped needs >= 100 sites where the two parents are opposite homozygotes, else the trio
+    verdict is 'na' (checkTriple in vcfped.py).  At 1000 SNPs the median true trio had 86 and
+    almost none were called; the default cohort must stay well above the floor.
+    """
+    import numpy as np
+    samples, _, obs, _ = vcfs
+    col = {s: i for i, s in enumerate(samples)}
+    samples_tsv = {r['ID']: r for r in _tsv(_path(sim_dir, '_truth_samples.tsv'))}
+    counts = []
+    for line in open(_path(sim_dir, '_truth.fam')):
+        _, iid, pat, mat, *_ = line.split()
+        flags = samples_tsv[iid]['FLAGS']
+        if pat == '0' or mat == '0' or pat == mat or 'inbred' in flags or 'parents_are_relatives' in flags:
+            continue
+        a, b = obs[col[pat]], obs[col[mat]]
+        counts.append(int((((a == 0) & (b == 2)) | ((a == 2) & (b == 0))).sum()))
+    assert len(counts) >= 100
+    assert np.percentile(counts, 5) >= 120 and np.median(counts) >= 200, np.percentile(counts, [5, 50])
 
 
 def test_role_switching_hub_is_pollen_parent_and_seed_parent(sim_dir, samples_tsv):

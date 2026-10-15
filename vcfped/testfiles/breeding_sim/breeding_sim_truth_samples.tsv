@@ -1,588 +1,588 @@
 ID	FID	PAT	MAT	GENERATION	SCENARIO	GENOTYPED	DUPLICATE_OF	F_PED	N_MISSING	FLAGS
-S0014	F001	0	0	0	trio	Y		0.0000	19	has_duplicate;pop1
-S0321	F001	0	0	0	trio	Y		0.0000	9	pop2
-S0046	F001	S0014	S0321	1	trio	Y		0.0000	16	
-S0299	F002	0	0	0	trio	Y		0.0000	26	pop1
-S0448	F002	0	0	0	trio	Y		0.0000	4	pop0
-S0400	F002	S0448	S0299	1	trio	Y		0.0000	20	
-S0127	F003	0	0	0	trio	Y		0.0000	16	pop2
-S0042	F003	0	0	0	trio	Y		0.0000	17	pop2
-S0271	F003	S0042	S0127	1	trio	Y		0.0000	13	
-S0080	F004	0	0	0	trio	Y		0.0000	21	pop0
-S0095	F004	0	0	0	trio	Y		0.0000	29	has_duplicate;pop1
-S0113	F004	S0095	S0080	1	trio	Y		0.0000	26	
-S0465	F005	0	0	0	trio	Y		0.0000	23	pop2
-S0434	F005	0	0	0	trio	Y		0.0000	14	pop0
-S0309	F005	S0434	S0465	1	trio	Y		0.0000	25	
-S0023	F006	0	0	0	trio	Y		0.0000	10	pop2
-S0068	F006	0	0	0	trio	Y		0.0000	43	pop0
-S0447	F006	S0068	S0023	1	trio	Y		0.0000	11	
-S0385	F007	0	0	0	cross_pop_trio	Y		0.0000	7	pop0
-S0081	F007	0	0	0	cross_pop_trio	Y		0.0000	37	has_duplicate;pop2
-S0102	F007	S0385	S0081	1	cross_pop_trio	Y		0.0000	9	
-S0158	F008	0	0	0	cross_pop_trio	Y		0.0000	12	pop0
-S0198	F008	0	0	0	cross_pop_trio	Y		0.0000	9	pop2
-S0155	F008	S0198	S0158	1	cross_pop_trio	Y		0.0000	10	
-S0332	F009	0	0	0	cross_pop_trio	Y		0.0000	5	pop0
-S0066	F009	0	0	0	cross_pop_trio	Y		0.0000	9	pop2
-S0240	F009	S0332	S0066	1	cross_pop_trio	Y		0.0000	18	has_duplicate
-S0110	F010	0	0	0	fullsib	Y		0.0000	9	pop2
-S0490	F010	0	0	0	fullsib	Y		0.0000	22	pop0
-S0433	F010	S0490	S0110	1	fullsib	Y		0.0000	11	
-S0184	F010	S0110	S0490	1	fullsib	Y		0.0000	16	
-S0233	F011	0	0	0	fullsib	Y		0.0000	6	high_error;pop1
-S0437	F011	0	0	0	fullsib	Y		0.0000	2	has_duplicate;pop2
-S0333	F011	S0233	S0437	1	fullsib	Y		0.0000	10	has_duplicate
-S0300	F011	S0233	S0437	1	fullsib	Y		0.0000	46	
-S0145	F011	S0233	S0437	1	fullsib	Y		0.0000	4	
-S0021	F012	0	0	0	fullsib	Y		0.0000	18	pop2
-S0469	F012	0	0	0	fullsib	Y		0.0000	8	pop0
-S0383	F012	S0021	S0469	1	fullsib	Y		0.0000	13	
-S0248	F012	S0469	S0021	1	fullsib	Y		0.0000	8	
-S0317	F012	S0021	S0469	1	fullsib	Y		0.0000	8	
-S0417	F012	S0021	S0469	1	fullsib	Y		0.0000	7	has_duplicate
-S0424	F013	0	0	0	fullsib	Y		0.0000	24	pop0
-S0035	F013	0	0	0	fullsib	Y		0.0000	5	pop2
-S0319	F013	S0035	S0424	1	fullsib	Y		0.0000	20	
-S0171	F013	S0424	S0035	1	fullsib	Y		0.0000	19	
-S0114	F013	S0035	S0424	1	fullsib	Y		0.0000	23	
-S0311	F013	S0424	S0035	1	fullsib	Y		0.0000	17	
-S0119	F013	S0424	S0035	1	fullsib	Y		0.0000	36	
-S0146	F013	S0424	S0035	1	fullsib	Y		0.0000	9	
+S0014	F001	0	0	0	trio	Y		0.0000	78	has_duplicate;pop1
+S0321	F001	0	0	0	trio	Y		0.0000	32	pop2
+S0046	F001	S0014	S0321	1	trio	Y		0.0000	50	
+S0299	F002	0	0	0	trio	Y		0.0000	99	pop1
+S0448	F002	0	0	0	trio	Y		0.0000	12	pop0
+S0400	F002	S0448	S0299	1	trio	Y		0.0000	52	
+S0127	F003	0	0	0	trio	Y		0.0000	59	pop2
+S0042	F003	0	0	0	trio	Y		0.0000	41	pop2
+S0271	F003	S0042	S0127	1	trio	Y		0.0000	27	
+S0080	F004	0	0	0	trio	Y		0.0000	57	pop0
+S0095	F004	0	0	0	trio	Y		0.0000	113	has_duplicate;pop1
+S0113	F004	S0095	S0080	1	trio	Y		0.0000	58	
+S0465	F005	0	0	0	trio	Y		0.0000	76	pop2
+S0434	F005	0	0	0	trio	Y		0.0000	36	pop0
+S0309	F005	S0434	S0465	1	trio	Y		0.0000	81	
+S0023	F006	0	0	0	trio	Y		0.0000	20	pop2
+S0068	F006	0	0	0	trio	Y		0.0000	111	pop0
+S0447	F006	S0068	S0023	1	trio	Y		0.0000	29	
+S0385	F007	0	0	0	cross_pop_trio	Y		0.0000	15	pop0
+S0081	F007	0	0	0	cross_pop_trio	Y		0.0000	85	has_duplicate;pop2
+S0102	F007	S0385	S0081	1	cross_pop_trio	Y		0.0000	25	
+S0158	F008	0	0	0	cross_pop_trio	Y		0.0000	42	pop0
+S0198	F008	0	0	0	cross_pop_trio	Y		0.0000	35	pop2
+S0155	F008	S0198	S0158	1	cross_pop_trio	Y		0.0000	35	
+S0332	F009	0	0	0	cross_pop_trio	Y		0.0000	16	pop0
+S0066	F009	0	0	0	cross_pop_trio	Y		0.0000	8	pop2
+S0240	F009	S0332	S0066	1	cross_pop_trio	Y		0.0000	66	has_duplicate
+S0110	F010	0	0	0	fullsib	Y		0.0000	32	pop2
+S0490	F010	0	0	0	fullsib	Y		0.0000	58	pop0
+S0433	F010	S0490	S0110	1	fullsib	Y		0.0000	23	
+S0184	F010	S0110	S0490	1	fullsib	Y		0.0000	45	
+S0233	F011	0	0	0	fullsib	Y		0.0000	18	high_error;pop1
+S0437	F011	0	0	0	fullsib	Y		0.0000	18	has_duplicate;pop2
+S0333	F011	S0233	S0437	1	fullsib	Y		0.0000	34	has_duplicate
+S0300	F011	S0233	S0437	1	fullsib	Y		0.0000	91	
+S0145	F011	S0233	S0437	1	fullsib	Y		0.0000	11	
+S0021	F012	0	0	0	fullsib	Y		0.0000	50	pop2
+S0469	F012	0	0	0	fullsib	Y		0.0000	16	pop0
+S0383	F012	S0021	S0469	1	fullsib	Y		0.0000	44	
+S0248	F012	S0469	S0021	1	fullsib	Y		0.0000	51	
+S0317	F012	S0021	S0469	1	fullsib	Y		0.0000	36	
+S0417	F012	S0021	S0469	1	fullsib	Y		0.0000	19	has_duplicate
+S0424	F013	0	0	0	fullsib	Y		0.0000	61	pop0
+S0035	F013	0	0	0	fullsib	Y		0.0000	14	pop2
+S0319	F013	S0035	S0424	1	fullsib	Y		0.0000	74	
+S0171	F013	S0424	S0035	1	fullsib	Y		0.0000	41	
+S0114	F013	S0035	S0424	1	fullsib	Y		0.0000	53	
+S0311	F013	S0424	S0035	1	fullsib	Y		0.0000	37	
+S0119	F013	S0424	S0035	1	fullsib	Y		0.0000	99	
+S0146	F013	S0424	S0035	1	fullsib	Y		0.0000	39	
 U0001	F014	0	0	0	fullsib_noparents	N		0.0000		pop0
 U0002	F014	0	0	0	fullsib_noparents	N		0.0000		pop2
-S0480	F014	U0001	U0002	1	fullsib_noparents	Y		0.0000	11	parent_ungenotyped
-S0294	F014	U0001	U0002	1	fullsib_noparents	Y		0.0000	12	parent_ungenotyped
+S0480	F014	U0001	U0002	1	fullsib_noparents	Y		0.0000	23	parent_ungenotyped
+S0294	F014	U0001	U0002	1	fullsib_noparents	Y		0.0000	36	parent_ungenotyped
 U0003	F015	0	0	0	fullsib_noparents	N		0.0000		pop2
 U0004	F015	0	0	0	fullsib_noparents	N		0.0000		pop1
-S0228	F015	U0003	U0004	1	fullsib_noparents	Y		0.0000	10	parent_ungenotyped
-S0293	F015	U0004	U0003	1	fullsib_noparents	Y		0.0000	7	parent_ungenotyped
-S0471	F015	U0004	U0003	1	fullsib_noparents	Y		0.0000	16	parent_ungenotyped
+S0228	F015	U0003	U0004	1	fullsib_noparents	Y		0.0000	33	parent_ungenotyped
+S0293	F015	U0004	U0003	1	fullsib_noparents	Y		0.0000	20	parent_ungenotyped
+S0471	F015	U0004	U0003	1	fullsib_noparents	Y		0.0000	47	parent_ungenotyped
 U0005	F016	0	0	0	fullsib_noparents	N		0.0000		pop1
 U0006	F016	0	0	0	fullsib_noparents	N		0.0000		pop0
-S0161	F016	U0006	U0005	1	fullsib_noparents	Y		0.0000	4	parent_ungenotyped
-S0316	F016	U0005	U0006	1	fullsib_noparents	Y		0.0000	3	parent_ungenotyped
-S0229	F016	U0006	U0005	1	fullsib_noparents	Y		0.0000	20	parent_ungenotyped
-S0372	F016	U0005	U0006	1	fullsib_noparents	Y		0.0000	11	parent_ungenotyped
+S0161	F016	U0006	U0005	1	fullsib_noparents	Y		0.0000	26	parent_ungenotyped
+S0316	F016	U0005	U0006	1	fullsib_noparents	Y		0.0000	11	parent_ungenotyped
+S0229	F016	U0006	U0005	1	fullsib_noparents	Y		0.0000	59	parent_ungenotyped
+S0372	F016	U0005	U0006	1	fullsib_noparents	Y		0.0000	24	parent_ungenotyped
 U0007	F017	0	0	0	fullsib_noparents	N		0.0000		pop0
 U0008	F017	0	0	0	fullsib_noparents	N		0.0000		pop2
-S0387	F017	U0008	U0007	1	fullsib_noparents	Y		0.0000	6	has_duplicate;parent_ungenotyped
-S0218	F017	U0007	U0008	1	fullsib_noparents	Y		0.0000	3	parent_ungenotyped
-S0152	F017	U0008	U0007	1	fullsib_noparents	Y		0.0000	12	parent_ungenotyped
-S0242	F017	U0008	U0007	1	fullsib_noparents	Y		0.0000	7	parent_ungenotyped
-S0479	F017	U0007	U0008	1	fullsib_noparents	Y		0.0000	32	parent_ungenotyped
-S0441	F018	0	0	0	large_sibship	Y		0.0000	180	low_callrate;pop2
-S0045	F018	0	0	0	large_sibship	Y		0.0000	12	pop1
-S0026	F018	S0045	S0441	1	large_sibship	Y		0.0000	8	
-S0111	F018	S0045	S0441	1	large_sibship	Y		0.0000	12	
-S0012	F018	S0441	S0045	1	large_sibship	Y		0.0000	3	
-S0194	F018	S0045	S0441	1	large_sibship	Y		0.0000	5	
-S0346	F018	S0045	S0441	1	large_sibship	Y		0.0000	8	
-S0378	F018	S0045	S0441	1	large_sibship	Y		0.0000	6	
-S0130	F018	S0441	S0045	1	large_sibship	Y		0.0000	12	
-S0024	F018	S0045	S0441	1	large_sibship	Y		0.0000	4	
-S0077	F018	S0441	S0045	1	large_sibship	Y		0.0000	11	
-S0108	F018	S0045	S0441	1	large_sibship	Y		0.0000	26	has_duplicate
-S0199	F018	S0441	S0045	1	large_sibship	Y		0.0000	12	
-S0347	F018	S0045	S0441	1	large_sibship	Y		0.0000	8	
-S0269	F019	0	0	0	one_parent_genotyped	Y		0.0000	9	pop2
+S0387	F017	U0008	U0007	1	fullsib_noparents	Y		0.0000	35	has_duplicate;parent_ungenotyped
+S0218	F017	U0007	U0008	1	fullsib_noparents	Y		0.0000	15	parent_ungenotyped
+S0152	F017	U0008	U0007	1	fullsib_noparents	Y		0.0000	36	parent_ungenotyped
+S0242	F017	U0008	U0007	1	fullsib_noparents	Y		0.0000	28	parent_ungenotyped
+S0479	F017	U0007	U0008	1	fullsib_noparents	Y		0.0000	100	parent_ungenotyped
+S0441	F018	0	0	0	large_sibship	Y		0.0000	542	low_callrate;pop2
+S0045	F018	0	0	0	large_sibship	Y		0.0000	35	pop1
+S0026	F018	S0045	S0441	1	large_sibship	Y		0.0000	30	
+S0111	F018	S0045	S0441	1	large_sibship	Y		0.0000	37	
+S0012	F018	S0441	S0045	1	large_sibship	Y		0.0000	11	
+S0194	F018	S0045	S0441	1	large_sibship	Y		0.0000	14	
+S0346	F018	S0045	S0441	1	large_sibship	Y		0.0000	46	
+S0378	F018	S0045	S0441	1	large_sibship	Y		0.0000	24	
+S0130	F018	S0441	S0045	1	large_sibship	Y		0.0000	22	
+S0024	F018	S0045	S0441	1	large_sibship	Y		0.0000	19	
+S0077	F018	S0441	S0045	1	large_sibship	Y		0.0000	23	
+S0108	F018	S0045	S0441	1	large_sibship	Y		0.0000	55	has_duplicate
+S0199	F018	S0441	S0045	1	large_sibship	Y		0.0000	52	
+S0347	F018	S0045	S0441	1	large_sibship	Y		0.0000	32	
+S0269	F019	0	0	0	one_parent_genotyped	Y		0.0000	36	pop2
 U0009	F019	0	0	0	one_parent_genotyped	N		0.0000		pop2
-S0107	F019	U0009	S0269	1	one_parent_genotyped	Y		0.0000	18	parent_ungenotyped
-S0453	F019	S0269	U0009	1	one_parent_genotyped	Y		0.0000	13	parent_ungenotyped
-S0348	F019	S0269	U0009	1	one_parent_genotyped	Y		0.0000	3	parent_ungenotyped
-S0329	F020	0	0	0	one_parent_genotyped	Y		0.0000	10	pop1
+S0107	F019	U0009	S0269	1	one_parent_genotyped	Y		0.0000	51	parent_ungenotyped
+S0453	F019	S0269	U0009	1	one_parent_genotyped	Y		0.0000	57	parent_ungenotyped
+S0348	F019	S0269	U0009	1	one_parent_genotyped	Y		0.0000	13	parent_ungenotyped
+S0329	F020	0	0	0	one_parent_genotyped	Y		0.0000	32	pop1
 U0010	F020	0	0	0	one_parent_genotyped	N		0.0000		pop2
-S0190	F020	S0329	U0010	1	one_parent_genotyped	Y		0.0000	16	parent_ungenotyped
-S0458	F020	S0329	U0010	1	one_parent_genotyped	Y		0.0000	16	parent_ungenotyped
-S0027	F021	0	0	0	halfsib	Y		0.0000	7	pop0
+S0190	F020	S0329	U0010	1	one_parent_genotyped	Y		0.0000	51	parent_ungenotyped
+S0458	F020	S0329	U0010	1	one_parent_genotyped	Y		0.0000	64	parent_ungenotyped
+S0027	F021	0	0	0	halfsib	Y		0.0000	44	pop0
 U0011	F021	0	0	0	halfsib	N		0.0000		pop1
-S0193	F021	S0027	U0011	1	halfsib	Y		0.0000	24	parent_ungenotyped
-S0207	F021	S0027	U0011	1	halfsib	Y		0.0000	16	parent_ungenotyped
+S0193	F021	S0027	U0011	1	halfsib	Y		0.0000	56	parent_ungenotyped
+S0207	F021	S0027	U0011	1	halfsib	Y		0.0000	33	parent_ungenotyped
 U0012	F021	0	0	0	halfsib	N		0.0000		pop1
-S0085	F021	S0027	U0012	1	halfsib	Y		0.0000	6	parent_ungenotyped
-S0206	F021	S0027	U0012	1	halfsib	Y		0.0000	6	parent_ungenotyped
-S0036	F021	0	0	0	halfsib	Y		0.0000	32	pop2
-S0408	F021	S0036	S0027	1	halfsib	Y		0.0000	13	
-S0170	F021	S0027	S0036	1	halfsib	Y		0.0000	7	
-S0431	F021	0	0	0	halfsib	Y		0.0000	21	pop2
-S0295	F021	S0027	S0431	1	halfsib	Y		0.0000	27	
-S0093	F021	S0027	S0431	1	halfsib	Y		0.0000	7	
-S0079	F022	0	0	0	halfsib	Y		0.0000	10	pop2
-S0202	F022	0	0	0	halfsib	Y		0.0000	9	pop1
-S0277	F022	S0079	S0202	1	halfsib	Y		0.0000	32	
-S0338	F022	0	0	0	halfsib	Y		0.0000	28	pop0
-S0276	F022	S0338	S0079	1	halfsib	Y		0.0000	29	
+S0085	F021	S0027	U0012	1	halfsib	Y		0.0000	27	parent_ungenotyped
+S0206	F021	S0027	U0012	1	halfsib	Y		0.0000	14	parent_ungenotyped
+S0036	F021	0	0	0	halfsib	Y		0.0000	82	pop2
+S0408	F021	S0036	S0027	1	halfsib	Y		0.0000	34	
+S0170	F021	S0027	S0036	1	halfsib	Y		0.0000	39	
+S0431	F021	0	0	0	halfsib	Y		0.0000	58	pop2
+S0295	F021	S0027	S0431	1	halfsib	Y		0.0000	82	
+S0093	F021	S0027	S0431	1	halfsib	Y		0.0000	21	
+S0079	F022	0	0	0	halfsib	Y		0.0000	27	pop2
+S0202	F022	0	0	0	halfsib	Y		0.0000	40	pop1
+S0277	F022	S0079	S0202	1	halfsib	Y		0.0000	88	
+S0338	F022	0	0	0	halfsib	Y		0.0000	79	pop0
+S0276	F022	S0338	S0079	1	halfsib	Y		0.0000	72	
 U0013	F022	0	0	0	halfsib	N		0.0000		pop2
-S0008	F022	U0013	S0079	1	halfsib	Y		0.0000	25	parent_ungenotyped
+S0008	F022	U0013	S0079	1	halfsib	Y		0.0000	50	parent_ungenotyped
 U0014	F023	0	0	0	halfsib_shared_ungenotyped	N		0.0000		pop2
 U0015	F023	0	0	0	halfsib_shared_ungenotyped	N		0.0000		pop0
-S0405	F023	U0015	U0014	1	halfsib_shared_ungenotyped	Y		0.0000	10	parent_ungenotyped
-S0494	F023	U0015	U0014	1	halfsib_shared_ungenotyped	Y		0.0000	14	parent_ungenotyped
-S0064	F023	0	0	0	halfsib_shared_ungenotyped	Y		0.0000	16	pop1
-S0369	F023	S0064	U0014	1	halfsib_shared_ungenotyped	Y		0.0000	18	parent_ungenotyped
-S0349	F023	U0014	S0064	1	halfsib_shared_ungenotyped	Y		0.0000	15	parent_ungenotyped
-S0134	F023	0	0	0	halfsib_shared_ungenotyped	Y		0.0000	10	pop1
-S0446	F023	S0134	U0014	1	halfsib_shared_ungenotyped	Y		0.0000	3	parent_ungenotyped
-S0224	F023	U0014	S0134	1	halfsib_shared_ungenotyped	Y		0.0000	18	parent_ungenotyped
-S0009	F024	0	0	0	multigen	Y		0.0000	8	pop1
-S0058	F024	0	0	0	multigen	Y		0.0000	14	pop0
-S0292	F024	S0058	S0009	1	multigen	Y		0.0000	4	
-S0165	F024	S0009	S0058	1	multigen	Y		0.0000	25	
-S0105	F024	S0058	S0009	1	multigen	Y		0.0000	7	
-S0220	F024	S0058	S0009	1	multigen	Y		0.0000	17	
-S0302	F024	0	0	0	multigen	Y		0.0000	2	pop1
-S0289	F024	S0105	S0302	2	multigen	Y		0.0000	12	
-S0167	F024	S0302	S0105	2	multigen	Y		0.0000	24	
-S0314	F024	0	0	0	multigen	Y		0.0000	23	pop1
-S0290	F024	S0220	S0314	2	multigen	Y		0.0000	5	
-S0430	F024	S0220	S0314	2	multigen	Y		0.0000	5	
-S0018	F024	S0314	S0220	2	multigen	Y		0.0000	33	
-S0082	F024	0	0	0	multigen	Y		0.0000	3	pop2
-S0373	F024	S0082	S0292	2	multigen	Y		0.0000	25	
-S0495	F025	0	0	0	multigen	Y		0.0000	13	pop0
-S0086	F025	0	0	0	multigen	Y		0.0000	10	pop0
-S0320	F025	S0495	S0086	1	multigen	Y		0.0000	8	
-S0389	F025	S0086	S0495	1	multigen	Y		0.0000	22	
-S0247	F025	0	0	0	multigen	Y		0.0000	8	pop2
-S0318	F025	S0247	S0389	2	multigen	Y		0.0000	10	
-S0352	F025	S0389	S0247	2	multigen	Y		0.0000	8	
-S0062	F025	S0320	S0320	2	multigen	Y		0.5000	27	inbred;selfed
-S0482	F025	S0320	S0320	2	multigen	Y		0.5000	12	inbred;selfed
-S0330	F025	S0320	S0320	2	multigen	Y		0.5000	7	inbred;selfed
-S0043	F025	S0389	S0352	3	multigen	Y		0.2500	7	inbred;parent_x_own_offspring
-S0418	F025	0	0	0	multigen	Y		0.0000	11	pop1
-S0173	F025	S0330	S0418	3	multigen	Y		0.0000	7	
-S0455	F025	S0418	S0330	3	multigen	Y		0.0000	36	
-S0467	F025	S0418	S0330	3	multigen	Y		0.0000	10	
-S0186	F025	0	0	0	multigen	Y		0.0000	7	pop0
-S0241	F025	S0062	S0186	3	multigen	Y		0.0000	17	
-S0236	F026	0	0	0	multigen	Y		0.0000	11	pop0
-S0212	F026	0	0	0	multigen	Y		0.0000	25	pop2
-S0463	F026	S0212	S0236	1	multigen	Y		0.0000	41	
-S0144	F026	S0212	S0236	1	multigen	Y		0.0000	9	
-S0055	F026	S0236	S0212	1	multigen	Y		0.0000	8	
-S0196	F026	S0236	S0212	1	multigen	Y		0.0000	14	
-S0221	F026	S0055	S0236	2	multigen	Y		0.2500	8	inbred;parent_x_own_offspring
-S0226	F026	S0236	S0055	2	multigen	Y		0.2500	18	inbred;parent_x_own_offspring
-S0140	F026	S0055	S0236	2	multigen	Y		0.2500	4	inbred;parent_x_own_offspring
-S0031	F026	0	0	0	multigen	Y		0.0000	9	pop0
-S0344	F026	S0144	S0031	2	multigen	Y		0.0000	13	
-S0217	F026	S0031	S0144	2	multigen	Y		0.0000	15	
-S0238	F026	S0031	S0144	2	multigen	Y		0.0000	24	has_duplicate
-S0296	F026	0	0	0	multigen	Y		0.0000	21	pop1
-S0484	F026	S0196	S0296	2	multigen	Y		0.0000	3	
-S0115	F026	S0196	S0296	2	multigen	Y		0.0000	21	has_duplicate
-S0459	F026	0	0	0	multigen	Y		0.0000	9	pop0
-S0243	F026	S0459	S0115	3	multigen	Y		0.0000	10	
-S0370	F026	S0459	S0115	3	multigen	Y		0.0000	14	
-S0128	F026	S0115	S0459	3	multigen	Y		0.0000	10	
-S0328	F026	0	0	0	multigen	Y		0.0000	26	pop1
-S0015	F026	S0221	S0328	3	multigen	Y		0.0000	13	
-S0334	F026	S0144	S0344	3	multigen	Y		0.2500	20	inbred;parent_x_own_offspring
-S0282	F026	S0144	S0344	3	multigen	Y		0.2500	25	inbred;parent_x_own_offspring
-S0025	F026	S0243	S0459	4	multigen	Y		0.2500	23	inbred;parent_x_own_offspring
-S0265	F026	S0459	S0243	4	multigen	Y		0.2500	21	inbred;parent_x_own_offspring
-S0406	F026	S0459	S0243	4	multigen	Y		0.2500	8	inbred;parent_x_own_offspring
-S0380	F026	0	0	0	multigen	Y		0.0000	16	pop2
-S0187	F026	S0380	S0128	4	multigen	Y		0.0000	5	
-S0175	F026	S0380	S0128	4	multigen	Y		0.0000	16	
-S0415	F026	S0380	S0128	4	multigen	Y		0.0000	18	
-S0423	F026	S0144	S0334	4	multigen	Y		0.3750	13	has_duplicate;inbred;parent_x_own_offspring
-S0391	F026	S0334	S0144	4	multigen	Y		0.3750	18	inbred;parent_x_own_offspring
-S0059	F027	0	0	0	multigen_gaps	Y		0.0000	13	pop1
-S0048	F027	0	0	0	multigen_gaps	Y		0.0000	21	pop0
-S0498	F027	S0048	S0059	1	multigen_gaps	Y		0.0000	26	
+S0405	F023	U0015	U0014	1	halfsib_shared_ungenotyped	Y		0.0000	33	parent_ungenotyped
+S0494	F023	U0015	U0014	1	halfsib_shared_ungenotyped	Y		0.0000	46	parent_ungenotyped
+S0064	F023	0	0	0	halfsib_shared_ungenotyped	Y		0.0000	40	pop1
+S0369	F023	S0064	U0014	1	halfsib_shared_ungenotyped	Y		0.0000	55	parent_ungenotyped
+S0349	F023	U0014	S0064	1	halfsib_shared_ungenotyped	Y		0.0000	26	parent_ungenotyped
+S0134	F023	0	0	0	halfsib_shared_ungenotyped	Y		0.0000	45	pop1
+S0446	F023	S0134	U0014	1	halfsib_shared_ungenotyped	Y		0.0000	28	parent_ungenotyped
+S0224	F023	U0014	S0134	1	halfsib_shared_ungenotyped	Y		0.0000	61	parent_ungenotyped
+S0009	F024	0	0	0	multigen	Y		0.0000	39	pop1
+S0058	F024	0	0	0	multigen	Y		0.0000	42	pop0
+S0292	F024	S0058	S0009	1	multigen	Y		0.0000	21	
+S0165	F024	S0009	S0058	1	multigen	Y		0.0000	32	
+S0105	F024	S0058	S0009	1	multigen	Y		0.0000	19	
+S0220	F024	S0058	S0009	1	multigen	Y		0.0000	30	
+S0302	F024	0	0	0	multigen	Y		0.0000	20	pop1
+S0289	F024	S0105	S0302	2	multigen	Y		0.0000	33	
+S0167	F024	S0302	S0105	2	multigen	Y		0.0000	85	
+S0314	F024	0	0	0	multigen	Y		0.0000	60	pop1
+S0290	F024	S0220	S0314	2	multigen	Y		0.0000	29	
+S0430	F024	S0220	S0314	2	multigen	Y		0.0000	17	
+S0018	F024	S0314	S0220	2	multigen	Y		0.0000	78	
+S0082	F024	0	0	0	multigen	Y		0.0000	26	pop2
+S0373	F024	S0082	S0292	2	multigen	Y		0.0000	38	
+S0495	F025	0	0	0	multigen	Y		0.0000	55	pop0
+S0086	F025	0	0	0	multigen	Y		0.0000	30	pop0
+S0320	F025	S0495	S0086	1	multigen	Y		0.0000	26	
+S0389	F025	S0086	S0495	1	multigen	Y		0.0000	46	
+S0247	F025	0	0	0	multigen	Y		0.0000	35	pop2
+S0318	F025	S0247	S0389	2	multigen	Y		0.0000	23	
+S0352	F025	S0389	S0247	2	multigen	Y		0.0000	20	
+S0062	F025	S0320	S0320	2	multigen	Y		0.5000	81	inbred;selfed
+S0482	F025	S0320	S0320	2	multigen	Y		0.5000	34	inbred;selfed
+S0330	F025	S0320	S0320	2	multigen	Y		0.5000	19	inbred;selfed
+S0043	F025	S0389	S0352	3	multigen	Y		0.2500	30	inbred;parent_x_own_offspring
+S0418	F025	0	0	0	multigen	Y		0.0000	37	pop1
+S0173	F025	S0330	S0418	3	multigen	Y		0.0000	26	
+S0455	F025	S0418	S0330	3	multigen	Y		0.0000	97	
+S0467	F025	S0418	S0330	3	multigen	Y		0.0000	23	
+S0186	F025	0	0	0	multigen	Y		0.0000	35	pop0
+S0241	F025	S0062	S0186	3	multigen	Y		0.0000	49	
+S0236	F026	0	0	0	multigen	Y		0.0000	15	pop0
+S0212	F026	0	0	0	multigen	Y		0.0000	68	pop2
+S0463	F026	S0212	S0236	1	multigen	Y		0.0000	115	
+S0144	F026	S0212	S0236	1	multigen	Y		0.0000	25	
+S0055	F026	S0236	S0212	1	multigen	Y		0.0000	28	
+S0196	F026	S0236	S0212	1	multigen	Y		0.0000	27	
+S0221	F026	S0055	S0236	2	multigen	Y		0.2500	18	inbred;parent_x_own_offspring
+S0226	F026	S0236	S0055	2	multigen	Y		0.2500	74	inbred;parent_x_own_offspring
+S0140	F026	S0055	S0236	2	multigen	Y		0.2500	17	inbred;parent_x_own_offspring
+S0031	F026	0	0	0	multigen	Y		0.0000	24	pop0
+S0344	F026	S0144	S0031	2	multigen	Y		0.0000	36	
+S0217	F026	S0031	S0144	2	multigen	Y		0.0000	39	
+S0238	F026	S0031	S0144	2	multigen	Y		0.0000	44	has_duplicate
+S0296	F026	0	0	0	multigen	Y		0.0000	82	pop1
+S0484	F026	S0196	S0296	2	multigen	Y		0.0000	23	
+S0115	F026	S0196	S0296	2	multigen	Y		0.0000	35	has_duplicate
+S0459	F026	0	0	0	multigen	Y		0.0000	40	pop0
+S0243	F026	S0459	S0115	3	multigen	Y		0.0000	33	
+S0370	F026	S0459	S0115	3	multigen	Y		0.0000	72	
+S0128	F026	S0115	S0459	3	multigen	Y		0.0000	18	
+S0328	F026	0	0	0	multigen	Y		0.0000	58	pop1
+S0015	F026	S0221	S0328	3	multigen	Y		0.0000	34	
+S0334	F026	S0144	S0344	3	multigen	Y		0.2500	59	inbred;parent_x_own_offspring
+S0282	F026	S0144	S0344	3	multigen	Y		0.2500	77	inbred;parent_x_own_offspring
+S0025	F026	S0243	S0459	4	multigen	Y		0.2500	57	inbred;parent_x_own_offspring
+S0265	F026	S0459	S0243	4	multigen	Y		0.2500	54	inbred;parent_x_own_offspring
+S0406	F026	S0459	S0243	4	multigen	Y		0.2500	17	inbred;parent_x_own_offspring
+S0380	F026	0	0	0	multigen	Y		0.0000	61	pop2
+S0187	F026	S0380	S0128	4	multigen	Y		0.0000	10	
+S0175	F026	S0380	S0128	4	multigen	Y		0.0000	49	
+S0415	F026	S0380	S0128	4	multigen	Y		0.0000	33	
+S0423	F026	S0144	S0334	4	multigen	Y		0.3750	37	has_duplicate;inbred;parent_x_own_offspring
+S0391	F026	S0334	S0144	4	multigen	Y		0.3750	28	inbred;parent_x_own_offspring
+S0059	F027	0	0	0	multigen_gaps	Y		0.0000	32	pop1
+S0048	F027	0	0	0	multigen_gaps	Y		0.0000	67	pop0
+S0498	F027	S0048	S0059	1	multigen_gaps	Y		0.0000	65	
 U0016	F027	S0048	S0059	1	multigen_gaps	N		0.0000		
-S0234	F027	S0048	S0059	1	multigen_gaps	Y		0.0000	8	
-S0411	F027	S0048	S0059	1	multigen_gaps	Y		0.0000	25	
-S0019	F027	S0411	S0411	2	multigen_gaps	Y		0.5000	15	inbred;selfed
-S0179	F027	0	0	0	multigen_gaps	Y		0.0000	2	pop2
+S0234	F027	S0048	S0059	1	multigen_gaps	Y		0.0000	21	
+S0411	F027	S0048	S0059	1	multigen_gaps	Y		0.0000	80	
+S0019	F027	S0411	S0411	2	multigen_gaps	Y		0.5000	63	inbred;selfed
+S0179	F027	0	0	0	multigen_gaps	Y		0.0000	17	pop2
 U0017	F027	S0498	S0179	2	multigen_gaps	N		0.0000		
-S0073	F027	S0179	S0498	2	multigen_gaps	Y		0.0000	5	
-S0028	F027	S0498	S0179	2	multigen_gaps	Y		0.0000	18	
-S0394	F027	S0234	U0016	2	multigen_gaps	Y		0.2500	18	inbred;parent_ungenotyped;parents_are_relatives
-S0011	F027	S0234	U0016	2	multigen_gaps	Y		0.2500	12	inbred;parent_ungenotyped;parents_are_relatives
-S0499	F027	U0016	S0234	2	multigen_gaps	Y		0.2500	7	inbred;parent_ungenotyped;parents_are_relatives
-S0216	F027	0	0	0	multigen_gaps	Y		0.0000	15	pop1
-S0056	F027	S0216	S0499	3	multigen_gaps	Y		0.0000	11	
+S0073	F027	S0179	S0498	2	multigen_gaps	Y		0.0000	17	
+S0028	F027	S0498	S0179	2	multigen_gaps	Y		0.0000	55	
+S0394	F027	S0234	U0016	2	multigen_gaps	Y		0.2500	39	inbred;parent_ungenotyped;parents_are_relatives
+S0011	F027	S0234	U0016	2	multigen_gaps	Y		0.2500	59	inbred;parent_ungenotyped;parents_are_relatives
+S0499	F027	U0016	S0234	2	multigen_gaps	Y		0.2500	27	inbred;parent_ungenotyped;parents_are_relatives
+S0216	F027	0	0	0	multigen_gaps	Y		0.0000	56	pop1
+S0056	F027	S0216	S0499	3	multigen_gaps	Y		0.0000	45	
 U0018	F027	0	0	0	multigen_gaps	N		0.0000		pop1
 U0019	F027	U0018	S0011	3	multigen_gaps	N		0.0000		parent_ungenotyped
-S0087	F027	S0011	U0018	3	multigen_gaps	Y		0.0000	8	parent_ungenotyped
+S0087	F027	S0011	U0018	3	multigen_gaps	Y		0.0000	26	parent_ungenotyped
 U0020	F027	0	0	0	multigen_gaps	N		0.0000		pop2
-S0288	F027	S0028	U0020	3	multigen_gaps	Y		0.0000	14	parent_ungenotyped
-S0466	F028	0	0	0	backcross	Y		0.0000	9	pop0
-S0283	F028	0	0	0	backcross	Y		0.0000	22	pop0
-S0376	F028	S0466	S0283	1	backcross	Y		0.0000	23	F1;has_duplicate
-S0030	F028	S0466	S0376	2	backcross	Y		0.2500	17	BC1;inbred;parent_x_own_offspring
-S0281	F028	S0466	S0376	2	backcross	Y		0.2500	11	BC1;inbred;parent_x_own_offspring
-S0323	F029	0	0	0	backcross	Y		0.0000	11	high_error;pop2
-S0375	F029	0	0	0	backcross	Y		0.0000	21	has_duplicate;pop2
-S0428	F029	S0375	S0323	1	backcross	Y		0.0000	3	F1
-S0440	F029	S0428	S0323	2	backcross	Y		0.2500	14	BC1;inbred;parent_x_own_offspring
-S0050	F029	S0323	S0428	2	backcross	Y		0.2500	12	BC1;inbred;parent_x_own_offspring
-S0133	F029	S0440	S0323	3	backcross	Y		0.3750	5	BC2;inbred;parent_x_own_offspring
-S0178	F029	S0440	S0323	3	backcross	Y		0.3750	12	BC2;inbred;parent_x_own_offspring
-S0305	F030	0	0	0	backcross	Y		0.0000	30	pop2
-S0339	F030	0	0	0	backcross	Y		0.0000	3	pop0
-S0213	F030	S0339	S0305	1	backcross	Y		0.0000	16	F1
-S0343	F030	S0213	S0305	2	backcross	Y		0.2500	14	BC1;inbred;parent_x_own_offspring
-S0426	F030	S0305	S0213	2	backcross	Y		0.2500	15	BC1;inbred;parent_x_own_offspring
-S0436	F030	S0305	S0343	3	backcross	Y		0.3750	14	BC2;inbred;parent_x_own_offspring
-S0488	F030	S0343	S0305	3	backcross	Y		0.3750	10	BC2;inbred;parent_x_own_offspring
-S0010	F030	S0436	S0305	4	backcross	Y		0.4375	14	BC3;inbred;parent_x_own_offspring
-S0393	F030	S0436	S0305	4	backcross	Y		0.4375	21	BC3;inbred;parent_x_own_offspring
-S0255	F031	0	0	0	backcross	Y		0.0000	26	pop1
-S0481	F031	0	0	0	backcross	Y		0.0000	11	has_duplicate;pop0
-S0138	F031	S0255	S0481	1	backcross	Y		0.0000	16	F1
-S0203	F031	S0138	S0255	2	backcross	Y		0.2500	14	BC1;inbred;parent_x_own_offspring
-S0462	F031	S0138	S0255	2	backcross	Y		0.2500	30	BC1;inbred;parent_x_own_offspring
-S0214	F031	S0203	S0255	3	backcross	Y		0.3750	12	BC2;inbred;parent_x_own_offspring
-S0476	F031	S0203	S0255	3	backcross	Y		0.3750	15	BC2;inbred;parent_x_own_offspring
-S0486	F031	S0214	S0255	4	backcross	Y		0.4375	11	BC3;inbred;parent_x_own_offspring
-S0341	F031	S0255	S0214	4	backcross	Y		0.4375	10	BC3;inbred;parent_x_own_offspring
-S0033	F031	S0255	S0486	5	backcross	Y		0.4688	10	BC4;inbred;parent_x_own_offspring
-S0354	F031	S0255	S0486	5	backcross	Y		0.4688	34	BC4;inbred;parent_x_own_offspring
-S0192	F032	0	0	0	backcross_other	Y		0.0000	3	pop2
-S0065	F032	0	0	0	backcross_other	Y		0.0000	15	pop1
-S0390	F032	S0192	S0065	1	backcross_other	Y		0.0000	8	
-S0139	F032	S0192	S0065	1	backcross_other	Y		0.0000	5	
-S0280	F032	S0065	S0390	2	backcross_other	Y		0.2500	7	inbred;parent_x_own_offspring
-S0401	F032	S0065	S0390	2	backcross_other	Y		0.2500	9	inbred;parent_x_own_offspring
-S0141	F032	S0192	S0139	2	backcross_other	Y		0.2500	17	has_duplicate;inbred;parent_x_own_offspring
-S0444	F033	0	0	0	grandparent_cross	Y		0.0000	7	pop0
-S0312	F033	0	0	0	grandparent_cross	Y		0.0000	5	pop1
-S0154	F033	0	0	0	grandparent_cross	Y		0.0000	11	pop0
-S0336	F033	S0312	S0444	1	grandparent_cross	Y		0.0000	12	
-S0160	F033	S0312	S0444	1	grandparent_cross	Y		0.0000	13	
-S0301	F033	S0154	S0336	2	grandparent_cross	Y		0.0000	9	
-S0209	F033	S0444	S0301	3	grandparent_cross	Y		0.1250	13	has_duplicate;inbred
-S0208	F033	S0301	S0444	3	grandparent_cross	Y		0.1250	6	inbred
-S0116	F033	S0301	S0160	3	grandparent_cross	Y		0.1250	21	inbred
-S0273	F034	0	0	0	grandparent_cross	Y		0.0000	15	pop0
-S0395	F034	0	0	0	grandparent_cross	Y		0.0000	16	pop1
-S0007	F034	0	0	0	grandparent_cross	Y		0.0000	8	pop2
-S0261	F034	S0395	S0273	1	grandparent_cross	Y		0.0000	21	
-S0275	F034	S0273	S0395	1	grandparent_cross	Y		0.0000	33	
-S0177	F034	S0007	S0261	2	grandparent_cross	Y		0.0000	12	
-S0306	F034	S0177	S0273	3	grandparent_cross	Y		0.1250	48	inbred
-S0006	F034	S0177	S0273	3	grandparent_cross	Y		0.1250	14	inbred
-S0204	F034	S0275	S0177	3	grandparent_cross	Y		0.1250	4	inbred
-S0239	F035	0	0	0	selfing	Y		0.0000	11	pop0
-S0244	F035	S0239	S0239	1	selfing	Y		0.5000	8	F2;inbred;selfed
+S0288	F027	S0028	U0020	3	multigen_gaps	Y		0.0000	29	parent_ungenotyped
+S0466	F028	0	0	0	backcross	Y		0.0000	50	pop0
+S0283	F028	0	0	0	backcross	Y		0.0000	73	pop0
+S0376	F028	S0466	S0283	1	backcross	Y		0.0000	68	F1;has_duplicate
+S0030	F028	S0466	S0376	2	backcross	Y		0.2500	46	BC1;inbred;parent_x_own_offspring
+S0281	F028	S0466	S0376	2	backcross	Y		0.2500	43	BC1;inbred;parent_x_own_offspring
+S0323	F029	0	0	0	backcross	Y		0.0000	33	high_error;pop2
+S0375	F029	0	0	0	backcross	Y		0.0000	44	has_duplicate;pop2
+S0428	F029	S0375	S0323	1	backcross	Y		0.0000	12	F1
+S0440	F029	S0428	S0323	2	backcross	Y		0.2500	35	BC1;inbred;parent_x_own_offspring
+S0050	F029	S0323	S0428	2	backcross	Y		0.2500	48	BC1;inbred;parent_x_own_offspring
+S0133	F029	S0440	S0323	3	backcross	Y		0.3750	17	BC2;inbred;parent_x_own_offspring
+S0178	F029	S0440	S0323	3	backcross	Y		0.3750	37	BC2;inbred;parent_x_own_offspring
+S0305	F030	0	0	0	backcross	Y		0.0000	95	pop2
+S0339	F030	0	0	0	backcross	Y		0.0000	22	pop0
+S0213	F030	S0339	S0305	1	backcross	Y		0.0000	26	F1
+S0343	F030	S0213	S0305	2	backcross	Y		0.2500	24	BC1;inbred;parent_x_own_offspring
+S0426	F030	S0305	S0213	2	backcross	Y		0.2500	56	BC1;inbred;parent_x_own_offspring
+S0436	F030	S0305	S0343	3	backcross	Y		0.3750	32	BC2;inbred;parent_x_own_offspring
+S0488	F030	S0343	S0305	3	backcross	Y		0.3750	28	BC2;inbred;parent_x_own_offspring
+S0010	F030	S0436	S0305	4	backcross	Y		0.4375	66	BC3;inbred;parent_x_own_offspring
+S0393	F030	S0436	S0305	4	backcross	Y		0.4375	75	BC3;inbred;parent_x_own_offspring
+S0255	F031	0	0	0	backcross	Y		0.0000	76	pop1
+S0481	F031	0	0	0	backcross	Y		0.0000	52	has_duplicate;pop0
+S0138	F031	S0255	S0481	1	backcross	Y		0.0000	55	F1
+S0203	F031	S0138	S0255	2	backcross	Y		0.2500	21	BC1;inbred;parent_x_own_offspring
+S0462	F031	S0138	S0255	2	backcross	Y		0.2500	108	BC1;inbred;parent_x_own_offspring
+S0214	F031	S0203	S0255	3	backcross	Y		0.3750	30	BC2;inbred;parent_x_own_offspring
+S0476	F031	S0203	S0255	3	backcross	Y		0.3750	33	BC2;inbred;parent_x_own_offspring
+S0486	F031	S0214	S0255	4	backcross	Y		0.4375	39	BC3;inbred;parent_x_own_offspring
+S0341	F031	S0255	S0214	4	backcross	Y		0.4375	28	BC3;inbred;parent_x_own_offspring
+S0033	F031	S0255	S0486	5	backcross	Y		0.4688	17	BC4;inbred;parent_x_own_offspring
+S0354	F031	S0255	S0486	5	backcross	Y		0.4688	78	BC4;inbred;parent_x_own_offspring
+S0192	F032	0	0	0	backcross_other	Y		0.0000	14	pop2
+S0065	F032	0	0	0	backcross_other	Y		0.0000	30	pop1
+S0390	F032	S0192	S0065	1	backcross_other	Y		0.0000	50	
+S0139	F032	S0192	S0065	1	backcross_other	Y		0.0000	25	
+S0280	F032	S0065	S0390	2	backcross_other	Y		0.2500	46	inbred;parent_x_own_offspring
+S0401	F032	S0065	S0390	2	backcross_other	Y		0.2500	40	inbred;parent_x_own_offspring
+S0141	F032	S0192	S0139	2	backcross_other	Y		0.2500	54	has_duplicate;inbred;parent_x_own_offspring
+S0444	F033	0	0	0	grandparent_cross	Y		0.0000	51	pop0
+S0312	F033	0	0	0	grandparent_cross	Y		0.0000	23	pop1
+S0154	F033	0	0	0	grandparent_cross	Y		0.0000	43	pop0
+S0336	F033	S0312	S0444	1	grandparent_cross	Y		0.0000	36	
+S0160	F033	S0312	S0444	1	grandparent_cross	Y		0.0000	29	
+S0301	F033	S0154	S0336	2	grandparent_cross	Y		0.0000	30	
+S0209	F033	S0444	S0301	3	grandparent_cross	Y		0.1250	23	has_duplicate;inbred
+S0208	F033	S0301	S0444	3	grandparent_cross	Y		0.1250	20	inbred
+S0116	F033	S0301	S0160	3	grandparent_cross	Y		0.1250	39	inbred
+S0273	F034	0	0	0	grandparent_cross	Y		0.0000	35	pop0
+S0395	F034	0	0	0	grandparent_cross	Y		0.0000	39	pop1
+S0007	F034	0	0	0	grandparent_cross	Y		0.0000	16	pop2
+S0261	F034	S0395	S0273	1	grandparent_cross	Y		0.0000	61	
+S0275	F034	S0273	S0395	1	grandparent_cross	Y		0.0000	92	
+S0177	F034	S0007	S0261	2	grandparent_cross	Y		0.0000	45	
+S0306	F034	S0177	S0273	3	grandparent_cross	Y		0.1250	120	inbred
+S0006	F034	S0177	S0273	3	grandparent_cross	Y		0.1250	45	inbred
+S0204	F034	S0275	S0177	3	grandparent_cross	Y		0.1250	27	inbred
+S0239	F035	0	0	0	selfing	Y		0.0000	21	pop0
+S0244	F035	S0239	S0239	1	selfing	Y		0.5000	41	F2;inbred;selfed
 U0021	F035	S0239	S0239	1	selfing	N		0.5000		F2;inbred;selfed
-S0470	F035	S0244	S0244	2	selfing	Y		0.7500	29	F3;inbred;selfed
-S0037	F035	S0244	S0244	2	selfing	Y		0.7500	11	F3;inbred;selfed
-S0112	F035	U0021	U0021	2	selfing	Y		0.7500	19	F3;inbred;parent_ungenotyped;selfed
+S0470	F035	S0244	S0244	2	selfing	Y		0.7500	66	F3;inbred;selfed
+S0037	F035	S0244	S0244	2	selfing	Y		0.7500	18	F3;inbred;selfed
+S0112	F035	U0021	U0021	2	selfing	Y		0.7500	52	F3;inbred;parent_ungenotyped;selfed
 U0022	F035	U0021	U0021	2	selfing	N		0.7500		F3;inbred;parent_ungenotyped;selfed
 U0023	F035	S0470	S0470	3	selfing	N		0.8750		F4;inbred;selfed
 U0024	F035	S0037	S0037	3	selfing	N		0.8750		F4;inbred;selfed
-S0034	F035	S0112	S0112	3	selfing	Y		0.8750	11	F4;inbred;selfed
-S0104	F035	U0022	U0022	3	selfing	Y		0.8750	14	F4;inbred;parent_ungenotyped;selfed
-S0404	F035	U0023	U0023	4	selfing	Y		0.9375	6	F5;inbred;parent_ungenotyped;selfed
+S0034	F035	S0112	S0112	3	selfing	Y		0.8750	20	F4;inbred;selfed
+S0104	F035	U0022	U0022	3	selfing	Y		0.8750	29	F4;inbred;parent_ungenotyped;selfed
+S0404	F035	U0023	U0023	4	selfing	Y		0.9375	34	F5;inbred;parent_ungenotyped;selfed
 U0025	F035	U0024	U0024	4	selfing	N		0.9375		F5;inbred;parent_ungenotyped;selfed
-S0267	F035	S0034	S0034	4	selfing	Y		0.9375	2	F5;inbred;selfed
-S0489	F035	S0104	S0104	4	selfing	Y		0.9375	16	F5;inbred;selfed
-S0249	F036	0	0	0	selfing	Y		0.0000	23	pop1
-S0256	F036	S0249	S0249	1	selfing	Y		0.5000	3	F2;inbred;selfed
-S0237	F036	S0249	S0249	1	selfing	Y		0.5000	11	F2;inbred;selfed
+S0267	F035	S0034	S0034	4	selfing	Y		0.9375	12	F5;inbred;selfed
+S0489	F035	S0104	S0104	4	selfing	Y		0.9375	53	F5;inbred;selfed
+S0249	F036	0	0	0	selfing	Y		0.0000	95	pop1
+S0256	F036	S0249	S0249	1	selfing	Y		0.5000	7	F2;inbred;selfed
+S0237	F036	S0249	S0249	1	selfing	Y		0.5000	33	F2;inbred;selfed
 U0026	F036	S0256	S0256	2	selfing	N		0.7500		F3;inbred;selfed
-S0164	F036	S0256	S0256	2	selfing	Y		0.7500	5	F3;inbred;selfed
+S0164	F036	S0256	S0256	2	selfing	Y		0.7500	32	F3;inbred;selfed
 U0027	F036	S0237	S0237	2	selfing	N		0.7500		F3;inbred;selfed
-S0071	F036	S0237	S0237	2	selfing	Y		0.7500	21	F3;inbred;selfed
+S0071	F036	S0237	S0237	2	selfing	Y		0.7500	79	F3;inbred;selfed
 U0028	F036	U0026	U0026	3	selfing	N		0.8750		F4;inbred;parent_ungenotyped;selfed
-S0061	F036	S0164	S0164	3	selfing	Y		0.8750	11	F4;has_duplicate;inbred;selfed
-S0313	F036	U0027	U0027	3	selfing	Y		0.8750	12	F4;inbred;parent_ungenotyped;selfed
-S0361	F036	S0071	S0071	3	selfing	Y		0.8750	22	F4;inbred;selfed
-S0022	F036	U0028	U0028	4	selfing	Y		0.9375	10	F5;inbred;parent_ungenotyped;selfed
-S0381	F036	S0061	S0061	4	selfing	Y		0.9375	5	F5;inbred;selfed
-S0450	F036	S0313	S0313	4	selfing	Y		0.9375	10	F5;inbred;selfed
-S0174	F036	S0361	S0361	4	selfing	Y		0.9375	14	F5;inbred;selfed
-S0159	F036	S0022	S0022	5	selfing	Y		0.9688	16	F6;inbred;selfed
-S0374	F036	S0381	S0381	5	selfing	Y		0.9688	10	F6;inbred;selfed
-S0168	F036	S0450	S0450	5	selfing	Y		0.9688	11	F6;inbred;selfed
-S0051	F036	S0174	S0174	5	selfing	Y		0.9688	6	F6;inbred;selfed
-S0359	F037	0	0	0	selfing	Y		0.0000	12	pop2
-S0076	F037	S0359	S0359	1	selfing	Y		0.5000	27	F2;inbred;selfed
-S0083	F037	S0359	S0359	1	selfing	Y		0.5000	27	F2;inbred;selfed
-S0284	F037	S0076	S0076	2	selfing	Y		0.7500	13	F3;inbred;selfed
-S0098	F037	S0076	S0076	2	selfing	Y		0.7500	8	F3;inbred;selfed
+S0061	F036	S0164	S0164	3	selfing	Y		0.8750	48	F4;has_duplicate;inbred;selfed
+S0313	F036	U0027	U0027	3	selfing	Y		0.8750	41	F4;inbred;parent_ungenotyped;selfed
+S0361	F036	S0071	S0071	3	selfing	Y		0.8750	42	F4;inbred;selfed
+S0022	F036	U0028	U0028	4	selfing	Y		0.9375	34	F5;inbred;parent_ungenotyped;selfed
+S0381	F036	S0061	S0061	4	selfing	Y		0.9375	26	F5;inbred;selfed
+S0450	F036	S0313	S0313	4	selfing	Y		0.9375	26	F5;inbred;selfed
+S0174	F036	S0361	S0361	4	selfing	Y		0.9375	30	F5;inbred;selfed
+S0159	F036	S0022	S0022	5	selfing	Y		0.9688	36	F6;inbred;selfed
+S0374	F036	S0381	S0381	5	selfing	Y		0.9688	32	F6;inbred;selfed
+S0168	F036	S0450	S0450	5	selfing	Y		0.9688	25	F6;inbred;selfed
+S0051	F036	S0174	S0174	5	selfing	Y		0.9688	45	F6;inbred;selfed
+S0359	F037	0	0	0	selfing	Y		0.0000	43	pop2
+S0076	F037	S0359	S0359	1	selfing	Y		0.5000	79	F2;inbred;selfed
+S0083	F037	S0359	S0359	1	selfing	Y		0.5000	43	F2;inbred;selfed
+S0284	F037	S0076	S0076	2	selfing	Y		0.7500	35	F3;inbred;selfed
+S0098	F037	S0076	S0076	2	selfing	Y		0.7500	23	F3;inbred;selfed
 U0029	F037	S0083	S0083	2	selfing	N		0.7500		F3;inbred;selfed
-S0412	F037	S0083	S0083	2	selfing	Y		0.7500	14	F3;inbred;selfed
-S0439	F037	S0284	S0284	3	selfing	Y		0.8750	10	F4;inbred;selfed
-S0069	F037	S0098	S0098	3	selfing	Y		0.8750	5	F4;inbred;selfed
+S0412	F037	S0083	S0083	2	selfing	Y		0.7500	36	F3;inbred;selfed
+S0439	F037	S0284	S0284	3	selfing	Y		0.8750	28	F4;inbred;selfed
+S0069	F037	S0098	S0098	3	selfing	Y		0.8750	12	F4;inbred;selfed
 U0030	F037	U0029	U0029	3	selfing	N		0.8750		F4;inbred;parent_ungenotyped;selfed
 U0031	F037	S0412	S0412	3	selfing	N		0.8750		F4;inbred;selfed
-S0172	F037	S0439	S0439	4	selfing	Y		0.9375	28	F5;inbred;selfed
-S0278	F037	S0069	S0069	4	selfing	Y		0.9375	23	F5;has_duplicate;inbred;selfed
-S0310	F037	U0030	U0030	4	selfing	Y		0.9375	8	F5;inbred;parent_ungenotyped;selfed
-S0377	F037	U0031	U0031	4	selfing	Y		0.9375	23	F5;inbred;parent_ungenotyped;selfed
-S0029	F037	S0172	S0172	5	selfing	Y		0.9688	22	F6;inbred;selfed
+S0172	F037	S0439	S0439	4	selfing	Y		0.9375	78	F5;inbred;selfed
+S0278	F037	S0069	S0069	4	selfing	Y		0.9375	62	F5;has_duplicate;inbred;selfed
+S0310	F037	U0030	U0030	4	selfing	Y		0.9375	24	F5;inbred;parent_ungenotyped;selfed
+S0377	F037	U0031	U0031	4	selfing	Y		0.9375	80	F5;inbred;parent_ungenotyped;selfed
+S0029	F037	S0172	S0172	5	selfing	Y		0.9688	55	F6;inbred;selfed
 U0032	F037	S0278	S0278	5	selfing	N		0.9688		F6;inbred;selfed
 U0033	F037	S0310	S0310	5	selfing	N		0.9688		F6;inbred;selfed
 U0034	F037	S0377	S0377	5	selfing	N		0.9688		F6;inbred;selfed
-S0382	F038	0	0	0	inbred_mating	Y		0.0000	5	pop1
-S0272	F038	0	0	0	inbred_mating	Y		0.0000	26	pop0
-S0407	F038	0	0	0	inbred_mating	Y		0.0000	18	pop0
-S0125	F038	S0272	S0382	1	inbred_mating	Y		0.0000	14	
-S0257	F038	S0382	S0272	1	inbred_mating	Y		0.0000	7	has_duplicate
-S0188	F038	S0272	S0382	1	inbred_mating	Y		0.0000	9	
-S0442	F038	S0382	S0407	1	inbred_mating	Y		0.0000	17	
-S0379	F038	S0382	S0407	1	inbred_mating	Y		0.0000	20	
-S0147	F038	S0257	S0125	2	inbred_mating	Y		0.2500	8	inbred;parents_are_relatives
-S0500	F038	S0257	S0125	2	inbred_mating	Y		0.2500	4	inbred;parents_are_relatives
-S0151	F038	S0188	S0442	2	inbred_mating	Y		0.1250	16	inbred;parents_are_relatives
-S0040	F038	0	0	0	inbred_mating	Y		0.0000	14	pop1
-S0189	F038	S0040	S0125	2	inbred_mating	Y		0.0000	21	
-S0478	F038	0	0	0	inbred_mating	Y		0.0000	3	pop0
-S0143	F038	S0478	S0257	2	inbred_mating	Y		0.0000	7	
-S0263	F038	S0189	S0143	3	inbred_mating	Y		0.0625	40	inbred
-S0004	F039	0	0	0	inbred_mating	Y		0.0000	7	pop1
-S0235	F039	0	0	0	inbred_mating	Y		0.0000	3	pop0
-S0365	F039	0	0	0	inbred_mating	Y		0.0000	26	pop2
-S0180	F039	S0235	S0004	1	inbred_mating	Y		0.0000	6	has_duplicate
-S0350	F039	S0004	S0235	1	inbred_mating	Y		0.0000	20	
-S0472	F039	S0004	S0235	1	inbred_mating	Y		0.0000	18	
-S0002	F039	S0004	S0365	1	inbred_mating	Y		0.0000	19	
-S0149	F039	S0004	S0365	1	inbred_mating	Y		0.0000	20	
-S0403	F039	S0180	S0350	2	inbred_mating	Y		0.2500	11	inbred;parents_are_relatives
-S0326	F039	S0350	S0180	2	inbred_mating	Y		0.2500	8	inbred;parents_are_relatives
-S0067	F039	S0472	S0002	2	inbred_mating	Y		0.1250	24	inbred;parents_are_relatives
-S0491	F039	0	0	0	inbred_mating	Y		0.0000	17	pop0
-S0032	F039	S0180	S0491	2	inbred_mating	Y		0.0000	7	
-S0464	F039	0	0	0	inbred_mating	Y		0.0000	11	pop0
-S0075	F039	S0464	S0350	2	inbred_mating	Y		0.0000	20	
-S0260	F039	S0032	S0075	3	inbred_mating	Y		0.0625	17	has_duplicate;inbred
+S0382	F038	0	0	0	inbred_mating	Y		0.0000	37	pop1
+S0272	F038	0	0	0	inbred_mating	Y		0.0000	66	pop0
+S0407	F038	0	0	0	inbred_mating	Y		0.0000	29	pop0
+S0125	F038	S0272	S0382	1	inbred_mating	Y		0.0000	30	
+S0257	F038	S0382	S0272	1	inbred_mating	Y		0.0000	33	has_duplicate
+S0188	F038	S0272	S0382	1	inbred_mating	Y		0.0000	34	
+S0442	F038	S0382	S0407	1	inbred_mating	Y		0.0000	61	
+S0379	F038	S0382	S0407	1	inbred_mating	Y		0.0000	69	
+S0147	F038	S0257	S0125	2	inbred_mating	Y		0.2500	13	inbred;parents_are_relatives
+S0500	F038	S0257	S0125	2	inbred_mating	Y		0.2500	22	inbred;parents_are_relatives
+S0151	F038	S0188	S0442	2	inbred_mating	Y		0.1250	26	inbred;parents_are_relatives
+S0040	F038	0	0	0	inbred_mating	Y		0.0000	35	pop1
+S0189	F038	S0040	S0125	2	inbred_mating	Y		0.0000	67	
+S0478	F038	0	0	0	inbred_mating	Y		0.0000	10	pop0
+S0143	F038	S0478	S0257	2	inbred_mating	Y		0.0000	19	
+S0263	F038	S0189	S0143	3	inbred_mating	Y		0.0625	85	inbred
+S0004	F039	0	0	0	inbred_mating	Y		0.0000	30	pop1
+S0235	F039	0	0	0	inbred_mating	Y		0.0000	25	pop0
+S0365	F039	0	0	0	inbred_mating	Y		0.0000	58	pop2
+S0180	F039	S0235	S0004	1	inbred_mating	Y		0.0000	16	has_duplicate
+S0350	F039	S0004	S0235	1	inbred_mating	Y		0.0000	49	
+S0472	F039	S0004	S0235	1	inbred_mating	Y		0.0000	57	
+S0002	F039	S0004	S0365	1	inbred_mating	Y		0.0000	64	
+S0149	F039	S0004	S0365	1	inbred_mating	Y		0.0000	54	
+S0403	F039	S0180	S0350	2	inbred_mating	Y		0.2500	34	inbred;parents_are_relatives
+S0326	F039	S0350	S0180	2	inbred_mating	Y		0.2500	27	inbred;parents_are_relatives
+S0067	F039	S0472	S0002	2	inbred_mating	Y		0.1250	83	inbred;parents_are_relatives
+S0491	F039	0	0	0	inbred_mating	Y		0.0000	56	pop0
+S0032	F039	S0180	S0491	2	inbred_mating	Y		0.0000	18	
+S0464	F039	0	0	0	inbred_mating	Y		0.0000	47	pop0
+S0075	F039	S0464	S0350	2	inbred_mating	Y		0.0000	64	
+S0260	F039	S0032	S0075	3	inbred_mating	Y		0.0625	45	has_duplicate;inbred
 U0035	F040	0	0	0	hybrid	N		0.0000		pop1
 U0036	F040	U0035	U0035	1	hybrid	N		0.5000		inbred;parent_ungenotyped;selfed
 U0037	F040	U0036	U0036	2	hybrid	N		0.7500		inbred;parent_ungenotyped;selfed
 U0038	F040	U0037	U0037	3	hybrid	N		0.8750		inbred;parent_ungenotyped;selfed
 U0039	F040	U0038	U0038	4	hybrid	N		0.9375		inbred;parent_ungenotyped;selfed
-S0078	F040	U0039	U0039	5	hybrid	Y		0.9688	2	F6;inbred;parent_ungenotyped;selfed
+S0078	F040	U0039	U0039	5	hybrid	Y		0.9688	17	F6;inbred;parent_ungenotyped;selfed
 U0040	F040	0	0	0	hybrid	N		0.0000		pop1
 U0041	F040	U0040	U0040	1	hybrid	N		0.5000		inbred;parent_ungenotyped;selfed
 U0042	F040	U0041	U0041	2	hybrid	N		0.7500		inbred;parent_ungenotyped;selfed
 U0043	F040	U0042	U0042	3	hybrid	N		0.8750		inbred;parent_ungenotyped;selfed
 U0044	F040	U0043	U0043	4	hybrid	N		0.9375		inbred;parent_ungenotyped;selfed
-S0121	F040	U0044	U0044	5	hybrid	Y		0.9688	27	F6;inbred;parent_ungenotyped;selfed
-S0181	F040	S0121	S0078	6	hybrid	Y		0.0000	23	
-S0456	F040	S0078	S0121	6	hybrid	Y		0.0000	27	
-S0368	F040	S0456	S0181	7	hybrid	Y		0.4922	10	inbred;parents_are_relatives
-S0097	F040	S0456	S0181	7	hybrid	Y		0.4922	8	inbred;parents_are_relatives
-S0041	F040	S0181	S0456	7	hybrid	Y		0.4922	4	inbred;parents_are_relatives
-S0340	F040	S0181	S0181	7	hybrid	Y		0.5000	39	inbred;selfed
-S0325	F040	S0181	S0181	7	hybrid	Y		0.5000	7	inbred;selfed
+S0121	F040	U0044	U0044	5	hybrid	Y		0.9688	87	F6;inbred;parent_ungenotyped;selfed
+S0181	F040	S0121	S0078	6	hybrid	Y		0.0000	84	
+S0456	F040	S0078	S0121	6	hybrid	Y		0.0000	61	
+S0368	F040	S0456	S0181	7	hybrid	Y		0.4922	42	inbred;parents_are_relatives
+S0097	F040	S0456	S0181	7	hybrid	Y		0.4922	29	inbred;parents_are_relatives
+S0041	F040	S0181	S0456	7	hybrid	Y		0.4922	16	inbred;parents_are_relatives
+S0340	F040	S0181	S0181	7	hybrid	Y		0.5000	78	inbred;selfed
+S0325	F040	S0181	S0181	7	hybrid	Y		0.5000	22	inbred;selfed
 U0045	F041	0	0	0	hybrid	N		0.0000		pop2
 U0046	F041	U0045	U0045	1	hybrid	N		0.5000		inbred;parent_ungenotyped;selfed
 U0047	F041	U0046	U0046	2	hybrid	N		0.7500		inbred;parent_ungenotyped;selfed
 U0048	F041	U0047	U0047	3	hybrid	N		0.8750		inbred;parent_ungenotyped;selfed
 U0049	F041	U0048	U0048	4	hybrid	N		0.9375		inbred;parent_ungenotyped;selfed
-S0362	F041	U0049	U0049	5	hybrid	Y		0.9688	5	F6;inbred;parent_ungenotyped;selfed
+S0362	F041	U0049	U0049	5	hybrid	Y		0.9688	18	F6;inbred;parent_ungenotyped;selfed
 U0050	F041	0	0	0	hybrid	N		0.0000		pop2
 U0051	F041	U0050	U0050	1	hybrid	N		0.5000		inbred;parent_ungenotyped;selfed
 U0052	F041	U0051	U0051	2	hybrid	N		0.7500		inbred;parent_ungenotyped;selfed
 U0053	F041	U0052	U0052	3	hybrid	N		0.8750		inbred;parent_ungenotyped;selfed
 U0054	F041	U0053	U0053	4	hybrid	N		0.9375		inbred;parent_ungenotyped;selfed
-S0308	F041	U0054	U0054	5	hybrid	Y		0.9688	29	F6;inbred;parent_ungenotyped;selfed
-S0474	F041	S0308	S0362	6	hybrid	Y		0.0000	12	
-S0210	F041	S0362	S0308	6	hybrid	Y		0.0000	5	
-S0222	F041	S0210	S0474	7	hybrid	Y		0.4922	9	inbred;parents_are_relatives
-S0402	F041	S0210	S0474	7	hybrid	Y		0.4922	14	inbred;parents_are_relatives
-S0419	F041	S0210	S0474	7	hybrid	Y		0.4922	41	has_duplicate;inbred;parents_are_relatives
-S0327	F041	S0474	S0210	7	hybrid	Y		0.4922	15	inbred;parents_are_relatives
-S0492	F041	S0474	S0474	7	hybrid	Y		0.5000	28	inbred;selfed
-S0493	F041	S0474	S0474	7	hybrid	Y		0.5000	4	inbred;selfed
+S0308	F041	U0054	U0054	5	hybrid	Y		0.9688	90	F6;inbred;parent_ungenotyped;selfed
+S0474	F041	S0308	S0362	6	hybrid	Y		0.0000	47	
+S0210	F041	S0362	S0308	6	hybrid	Y		0.0000	13	
+S0222	F041	S0210	S0474	7	hybrid	Y		0.4922	31	inbred;parents_are_relatives
+S0402	F041	S0210	S0474	7	hybrid	Y		0.4922	41	inbred;parents_are_relatives
+S0419	F041	S0210	S0474	7	hybrid	Y		0.4922	108	has_duplicate;inbred;parents_are_relatives
+S0327	F041	S0474	S0210	7	hybrid	Y		0.4922	40	inbred;parents_are_relatives
+S0492	F041	S0474	S0474	7	hybrid	Y		0.5000	71	inbred;selfed
+S0493	F041	S0474	S0474	7	hybrid	Y		0.5000	24	inbred;selfed
 U0055	F042	0	0	0	hybrid	N		0.0000		pop1
 U0056	F042	U0055	U0055	1	hybrid	N		0.5000		inbred;parent_ungenotyped;selfed
 U0057	F042	U0056	U0056	2	hybrid	N		0.7500		inbred;parent_ungenotyped;selfed
 U0058	F042	U0057	U0057	3	hybrid	N		0.8750		inbred;parent_ungenotyped;selfed
 U0059	F042	U0058	U0058	4	hybrid	N		0.9375		inbred;parent_ungenotyped;selfed
-S0438	F042	U0059	U0059	5	hybrid	Y		0.9688	6	F6;inbred;parent_ungenotyped;selfed
+S0438	F042	U0059	U0059	5	hybrid	Y		0.9688	10	F6;inbred;parent_ungenotyped;selfed
 U0060	F042	0	0	0	hybrid	N		0.0000		pop2
 U0061	F042	U0060	U0060	1	hybrid	N		0.5000		inbred;parent_ungenotyped;selfed
 U0062	F042	U0061	U0061	2	hybrid	N		0.7500		inbred;parent_ungenotyped;selfed
 U0063	F042	U0062	U0062	3	hybrid	N		0.8750		inbred;parent_ungenotyped;selfed
 U0064	F042	U0063	U0063	4	hybrid	N		0.9375		inbred;parent_ungenotyped;selfed
-S0420	F042	U0064	U0064	5	hybrid	Y		0.9688	5	F6;inbred;parent_ungenotyped;selfed
-S0262	F042	S0438	S0420	6	hybrid	Y		0.0000	3	
-S0253	F042	S0438	S0420	6	hybrid	Y		0.0000	17	
-S0017	F042	S0253	S0262	7	hybrid	Y		0.4922	46	inbred;parents_are_relatives
-S0351	F042	S0262	S0253	7	hybrid	Y		0.4922	30	inbred;parents_are_relatives
-S0285	F042	S0262	S0262	7	hybrid	Y		0.5000	7	inbred;selfed
-S0013	F042	S0262	S0262	7	hybrid	Y		0.5000	5	has_duplicate;inbred;selfed
+S0420	F042	U0064	U0064	5	hybrid	Y		0.9688	39	F6;inbred;parent_ungenotyped;selfed
+S0262	F042	S0438	S0420	6	hybrid	Y		0.0000	22	
+S0253	F042	S0438	S0420	6	hybrid	Y		0.0000	45	
+S0017	F042	S0253	S0262	7	hybrid	Y		0.4922	130	inbred;parents_are_relatives
+S0351	F042	S0262	S0253	7	hybrid	Y		0.4922	57	inbred;parents_are_relatives
+S0285	F042	S0262	S0262	7	hybrid	Y		0.5000	25	inbred;selfed
+S0013	F042	S0262	S0262	7	hybrid	Y		0.5000	17	has_duplicate;inbred;selfed
 U0065	F043	0	0	0	cryptic_cousins	N		0.0000		pop1
 U0066	F043	0	0	0	cryptic_cousins	N		0.0000		pop0
 U0067	F043	U0065	U0066	1	cryptic_cousins	N		0.0000		parent_ungenotyped
 U0068	F043	U0065	U0066	1	cryptic_cousins	N		0.0000		parent_ungenotyped
 U0069	F043	U0065	U0066	1	cryptic_cousins	N		0.0000		parent_ungenotyped
 U0070	F043	0	0	0	cryptic_cousins	N		0.0000		pop0
-S0266	F043	U0067	U0070	2	cryptic_cousins	Y		0.0000	6	parent_ungenotyped
-S0367	F043	U0067	U0070	2	cryptic_cousins	Y		0.0000	36	parent_ungenotyped
+S0266	F043	U0067	U0070	2	cryptic_cousins	Y		0.0000	30	parent_ungenotyped
+S0367	F043	U0067	U0070	2	cryptic_cousins	Y		0.0000	76	parent_ungenotyped
 U0071	F043	0	0	0	cryptic_cousins	N		0.0000		pop2
-S0131	F043	U0068	U0071	2	cryptic_cousins	Y		0.0000	6	has_duplicate;parent_ungenotyped
-S0356	F043	U0071	U0068	2	cryptic_cousins	Y		0.0000	11	parent_ungenotyped
+S0131	F043	U0068	U0071	2	cryptic_cousins	Y		0.0000	21	has_duplicate;parent_ungenotyped
+S0356	F043	U0071	U0068	2	cryptic_cousins	Y		0.0000	33	parent_ungenotyped
 U0072	F044	0	0	0	cryptic_sibs_as_founders	N		0.0000		pop2
 U0073	F044	0	0	0	cryptic_sibs_as_founders	N		0.0000		pop0
-S0331	F044	U0072	U0073	1	cryptic_sibs_as_founders	Y		0.0000	11	parent_ungenotyped
-S0106	F044	U0073	U0072	1	cryptic_sibs_as_founders	Y		0.0000	13	parent_ungenotyped
+S0331	F044	U0072	U0073	1	cryptic_sibs_as_founders	Y		0.0000	39	parent_ungenotyped
+S0106	F044	U0073	U0072	1	cryptic_sibs_as_founders	Y		0.0000	30	parent_ungenotyped
 U0074	F044	U0073	U0072	1	cryptic_sibs_as_founders	N		0.0000		parent_ungenotyped
-S0286	F044	0	0	0	cryptic_sibs_as_founders	Y		0.0000	12	pop1
-S0020	F044	S0331	S0286	2	cryptic_sibs_as_founders	Y		0.0000	27	
-S0100	F044	S0286	S0331	2	cryptic_sibs_as_founders	Y		0.0000	20	
-S0422	F044	0	0	0	cryptic_sibs_as_founders	Y		0.0000	8	pop2
-S0254	F044	S0106	S0422	2	cryptic_sibs_as_founders	Y		0.0000	9	
-S0148	F044	S0106	S0422	2	cryptic_sibs_as_founders	Y		0.0000	9	
+S0286	F044	0	0	0	cryptic_sibs_as_founders	Y		0.0000	36	pop1
+S0020	F044	S0331	S0286	2	cryptic_sibs_as_founders	Y		0.0000	73	
+S0100	F044	S0286	S0331	2	cryptic_sibs_as_founders	Y		0.0000	35	
+S0422	F044	0	0	0	cryptic_sibs_as_founders	Y		0.0000	28	pop2
+S0254	F044	S0106	S0422	2	cryptic_sibs_as_founders	Y		0.0000	24	
+S0148	F044	S0106	S0422	2	cryptic_sibs_as_founders	Y		0.0000	12	
 U0075	F045	0	0	0	cryptic_uncle_niece	N		0.0000		pop0
 U0076	F045	0	0	0	cryptic_uncle_niece	N		0.0000		pop1
 U0077	F045	U0075	U0076	1	cryptic_uncle_niece	N		0.0000		parent_ungenotyped
 U0078	F045	U0076	U0075	1	cryptic_uncle_niece	N		0.0000		parent_ungenotyped
-S0485	F045	U0076	U0075	1	cryptic_uncle_niece	Y		0.0000	13	parent_ungenotyped
+S0485	F045	U0076	U0075	1	cryptic_uncle_niece	Y		0.0000	23	parent_ungenotyped
 U0079	F045	0	0	0	cryptic_uncle_niece	N		0.0000		pop0
-S0454	F045	U0077	U0079	2	cryptic_uncle_niece	Y		0.0000	15	parent_ungenotyped
-S0200	F045	S0485	S0454	3	cryptic_uncle_niece	Y		0.1250	5	inbred
-S0185	F045	S0485	S0454	3	cryptic_uncle_niece	Y		0.1250	4	inbred
-S0355	F046	0	0	0	role_switch	Y		0.0000	15	hub_both_roles;pop2
-S0070	F046	0	0	0	role_switch	Y		0.0000	4	pop2
-S0232	F046	0	0	0	role_switch	Y		0.0000	6	pop1
-S0451	F046	S0355	S0070	1	role_switch	Y		0.0000	12	
-S0386	F046	S0355	S0070	1	role_switch	Y		0.0000	14	
-S0215	F046	S0232	S0355	1	role_switch	Y		0.0000	7	
-S0137	F046	S0232	S0355	1	role_switch	Y		0.0000	12	
-S0345	F047	0	0	0	role_switch	Y		0.0000	18	hub_both_roles;pop0
-S0251	F047	0	0	0	role_switch	Y		0.0000	7	pop1
-S0182	F047	0	0	0	role_switch	Y		0.0000	16	pop1
-S0364	F047	S0345	S0251	1	role_switch	Y		0.0000	37	
-S0413	F047	S0345	S0251	1	role_switch	Y		0.0000	23	
-S0298	F047	S0182	S0345	1	role_switch	Y		0.0000	24	
-S0287	F047	S0182	S0345	1	role_switch	Y		0.0000	2	
-S0120	F048	0	0	0	missing_middle	Y		0.0000	5	pop0
-S0384	F048	0	0	0	missing_middle	Y		0.0000	2	pop1
+S0454	F045	U0077	U0079	2	cryptic_uncle_niece	Y		0.0000	36	parent_ungenotyped
+S0200	F045	S0485	S0454	3	cryptic_uncle_niece	Y		0.1250	52	inbred
+S0185	F045	S0485	S0454	3	cryptic_uncle_niece	Y		0.1250	23	inbred
+S0355	F046	0	0	0	role_switch	Y		0.0000	45	hub_both_roles;pop2
+S0070	F046	0	0	0	role_switch	Y		0.0000	16	pop2
+S0232	F046	0	0	0	role_switch	Y		0.0000	17	pop1
+S0451	F046	S0355	S0070	1	role_switch	Y		0.0000	28	
+S0386	F046	S0355	S0070	1	role_switch	Y		0.0000	51	
+S0215	F046	S0232	S0355	1	role_switch	Y		0.0000	29	
+S0137	F046	S0232	S0355	1	role_switch	Y		0.0000	16	
+S0345	F047	0	0	0	role_switch	Y		0.0000	80	hub_both_roles;pop0
+S0251	F047	0	0	0	role_switch	Y		0.0000	33	pop1
+S0182	F047	0	0	0	role_switch	Y		0.0000	37	pop1
+S0364	F047	S0345	S0251	1	role_switch	Y		0.0000	108	
+S0413	F047	S0345	S0251	1	role_switch	Y		0.0000	51	
+S0298	F047	S0182	S0345	1	role_switch	Y		0.0000	54	
+S0287	F047	S0182	S0345	1	role_switch	Y		0.0000	13	
+S0120	F048	0	0	0	missing_middle	Y		0.0000	16	pop0
+S0384	F048	0	0	0	missing_middle	Y		0.0000	17	pop1
 U0080	F048	S0120	S0384	1	missing_middle	N		0.0000		
 U0081	F048	S0120	S0384	1	missing_middle	N		0.0000		
-S0264	F048	0	0	0	missing_middle	Y		0.0000	5	pop0
-S0473	F048	U0080	S0264	2	missing_middle	Y		0.0000	19	parent_ungenotyped
-S0291	F048	U0080	S0264	2	missing_middle	Y		0.0000	7	parent_ungenotyped
-S0001	F048	0	0	0	missing_middle	Y		0.0000	242	low_callrate;pop2
-S0183	F048	U0081	S0001	2	missing_middle	Y		0.0000	17	parent_ungenotyped
-S0396	F048	U0081	S0001	2	missing_middle	Y		0.0000	11	parent_ungenotyped
-S0245	F049	0	0	0	random_multigen	Y		0.0000	24	pop2
-S0475	F049	0	0	0	random_multigen	Y		0.0000	10	pop2
-S0315	F049	S0475	S0245	1	random_multigen	Y		0.0000	35	
-S0366	F049	S0245	S0475	1	random_multigen	Y		0.0000	11	
-S0427	F049	0	0	0	random_multigen	Y		0.0000	12	pop2
-S0054	F049	S0315	S0427	2	random_multigen	Y		0.0000	5	
+S0264	F048	0	0	0	missing_middle	Y		0.0000	34	pop0
+S0473	F048	U0080	S0264	2	missing_middle	Y		0.0000	42	parent_ungenotyped
+S0291	F048	U0080	S0264	2	missing_middle	Y		0.0000	38	parent_ungenotyped
+S0001	F048	0	0	0	missing_middle	Y		0.0000	721	low_callrate;pop2
+S0183	F048	U0081	S0001	2	missing_middle	Y		0.0000	23	parent_ungenotyped
+S0396	F048	U0081	S0001	2	missing_middle	Y		0.0000	34	parent_ungenotyped
+S0245	F049	0	0	0	random_multigen	Y		0.0000	55	pop2
+S0475	F049	0	0	0	random_multigen	Y		0.0000	25	pop2
+S0315	F049	S0475	S0245	1	random_multigen	Y		0.0000	86	
+S0366	F049	S0245	S0475	1	random_multigen	Y		0.0000	36	
+S0427	F049	0	0	0	random_multigen	Y		0.0000	44	pop2
+S0054	F049	S0315	S0427	2	random_multigen	Y		0.0000	16	
 U0082	F049	S0427	S0315	2	random_multigen	N		0.0000		
-S0270	F049	0	0	0	random_multigen	Y		0.0000	191	low_callrate;pop1
-S0397	F049	S0366	S0270	2	random_multigen	Y		0.0000	10	
-S0335	F049	S0366	S0270	2	random_multigen	Y		0.0000	14	
-S0132	F049	0	0	0	random_multigen	Y		0.0000	13	has_duplicate;pop2
-S0452	F049	S0132	S0335	3	random_multigen	Y		0.0000	6	
-S0003	F049	S0132	S0335	3	random_multigen	Y		0.0000	22	
-S0225	F049	S0335	S0132	3	random_multigen	Y		0.0000	25	
-S0353	F049	0	0	0	random_multigen	Y		0.0000	14	pop0
-S0074	F049	S0397	S0353	3	random_multigen	Y		0.0000	14	high_error
-S0162	F049	S0353	S0397	3	random_multigen	Y		0.0000	12	
-S0053	F049	U0082	U0082	3	random_multigen	Y		0.5000	4	inbred;parent_ungenotyped;selfed
-S0231	F049	U0082	U0082	3	random_multigen	Y		0.5000	22	inbred;parent_ungenotyped;selfed
-S0388	F049	U0082	U0082	3	random_multigen	Y		0.5000	10	inbred;parent_ungenotyped;selfed
-S0445	F050	0	0	0	halfsib	Y		0.0000	25	pop1
-S0259	F050	0	0	0	halfsib	Y		0.0000	21	pop0
-S0460	F050	S0259	S0445	1	halfsib	Y		0.0000	15	
+S0270	F049	0	0	0	random_multigen	Y		0.0000	634	low_callrate;pop1
+S0397	F049	S0366	S0270	2	random_multigen	Y		0.0000	17	
+S0335	F049	S0366	S0270	2	random_multigen	Y		0.0000	35	
+S0132	F049	0	0	0	random_multigen	Y		0.0000	41	has_duplicate;pop2
+S0452	F049	S0132	S0335	3	random_multigen	Y		0.0000	19	
+S0003	F049	S0132	S0335	3	random_multigen	Y		0.0000	52	
+S0225	F049	S0335	S0132	3	random_multigen	Y		0.0000	58	
+S0353	F049	0	0	0	random_multigen	Y		0.0000	51	pop0
+S0074	F049	S0397	S0353	3	random_multigen	Y		0.0000	47	high_error
+S0162	F049	S0353	S0397	3	random_multigen	Y		0.0000	33	
+S0053	F049	U0082	U0082	3	random_multigen	Y		0.5000	28	inbred;parent_ungenotyped;selfed
+S0231	F049	U0082	U0082	3	random_multigen	Y		0.5000	68	inbred;parent_ungenotyped;selfed
+S0388	F049	U0082	U0082	3	random_multigen	Y		0.5000	18	inbred;parent_ungenotyped;selfed
+S0445	F050	0	0	0	halfsib	Y		0.0000	50	pop1
+S0259	F050	0	0	0	halfsib	Y		0.0000	65	pop0
+S0460	F050	S0259	S0445	1	halfsib	Y		0.0000	46	
 U0083	F050	0	0	0	halfsib	N		0.0000		pop1
-S0416	F050	S0445	U0083	1	halfsib	Y		0.0000	15	parent_ungenotyped
-S0279	F051	0	0	0	fullsib	Y		0.0000	24	pop2
-S0342	F051	0	0	0	fullsib	Y		0.0000	23	pop2
-S0038	F051	S0342	S0279	1	fullsib	Y		0.0000	13	
-S0099	F051	S0279	S0342	1	fullsib	Y		0.0000	14	
-S0201	F052	0	0	0	random_multigen	Y		0.0000	4	pop0
-S0230	F052	0	0	0	random_multigen	Y		0.0000	31	contaminated;pop2
-S0084	F052	S0230	S0201	1	random_multigen	Y		0.0000	11	
-S0487	F052	S0230	S0201	1	random_multigen	Y		0.0000	8	
-S0049	F052	S0084	S0487	2	random_multigen	Y		0.2500	4	inbred;parents_are_relatives
-S0497	F052	S0084	S0487	2	random_multigen	Y		0.2500	12	inbred;parents_are_relatives
-S0191	F052	S0487	S0084	2	random_multigen	Y		0.2500	12	inbred;parents_are_relatives
-S0360	F052	0	0	0	random_multigen	Y		0.0000	9	pop0
-S0358	F052	S0360	S0084	2	random_multigen	Y		0.0000	12	
-S0166	F052	S0084	S0360	2	random_multigen	Y		0.0000	9	
-S0304	F052	S0084	S0360	2	random_multigen	Y		0.0000	21	has_duplicate
-S0468	F053	0	0	0	random_multigen	Y		0.0000	7	pop1
-S0197	F053	0	0	0	random_multigen	Y		0.0000	17	pop2
-S0461	F053	S0468	S0197	1	random_multigen	Y		0.0000	4	
-S0250	F053	S0197	S0468	1	random_multigen	Y		0.0000	8	
+S0416	F050	S0445	U0083	1	halfsib	Y		0.0000	60	parent_ungenotyped
+S0279	F051	0	0	0	fullsib	Y		0.0000	60	pop2
+S0342	F051	0	0	0	fullsib	Y		0.0000	92	pop2
+S0038	F051	S0342	S0279	1	fullsib	Y		0.0000	35	
+S0099	F051	S0279	S0342	1	fullsib	Y		0.0000	34	
+S0201	F052	0	0	0	random_multigen	Y		0.0000	19	pop0
+S0230	F052	0	0	0	random_multigen	Y		0.0000	94	contaminated;pop2
+S0084	F052	S0230	S0201	1	random_multigen	Y		0.0000	23	
+S0487	F052	S0230	S0201	1	random_multigen	Y		0.0000	30	
+S0049	F052	S0084	S0487	2	random_multigen	Y		0.2500	14	inbred;parents_are_relatives
+S0497	F052	S0084	S0487	2	random_multigen	Y		0.2500	17	inbred;parents_are_relatives
+S0191	F052	S0487	S0084	2	random_multigen	Y		0.2500	44	inbred;parents_are_relatives
+S0360	F052	0	0	0	random_multigen	Y		0.0000	20	pop0
+S0358	F052	S0360	S0084	2	random_multigen	Y		0.0000	42	
+S0166	F052	S0084	S0360	2	random_multigen	Y		0.0000	21	
+S0304	F052	S0084	S0360	2	random_multigen	Y		0.0000	61	has_duplicate
+S0468	F053	0	0	0	random_multigen	Y		0.0000	19	pop1
+S0197	F053	0	0	0	random_multigen	Y		0.0000	43	pop2
+S0461	F053	S0468	S0197	1	random_multigen	Y		0.0000	18	
+S0250	F053	S0197	S0468	1	random_multigen	Y		0.0000	27	
 U0084	F053	S0197	S0468	1	random_multigen	N		0.0000		
 U0085	F053	S0250	U0084	2	random_multigen	N		0.2500		inbred;parent_ungenotyped;parents_are_relatives
-S0425	F053	U0084	S0250	2	random_multigen	Y		0.2500	19	inbred;parent_ungenotyped;parents_are_relatives
-S0060	F053	0	0	0	random_multigen	Y		0.0000	5	pop1
+S0425	F053	U0084	S0250	2	random_multigen	Y		0.2500	60	inbred;parent_ungenotyped;parents_are_relatives
+S0060	F053	0	0	0	random_multigen	Y		0.0000	22	pop1
 U0086	F053	U0084	S0060	2	random_multigen	N		0.0000		parent_ungenotyped
-S0205	F053	U0084	S0060	2	random_multigen	Y		0.0000	9	parent_ungenotyped
-S0443	F053	0	0	0	random_multigen	Y		0.0000	24	has_duplicate;pop1
+S0205	F053	U0084	S0060	2	random_multigen	Y		0.0000	16	parent_ungenotyped
+S0443	F053	0	0	0	random_multigen	Y		0.0000	58	has_duplicate;pop1
 U0087	F053	S0461	S0443	2	random_multigen	N		0.0000		
-S0090	F053	S0443	S0461	2	random_multigen	Y		0.0000	12	
-S0410	F053	S0443	S0461	2	random_multigen	Y		0.0000	21	
-S0477	F054	0	0	0	fullsib	Y		0.0000	5	pop2
-S0103	F054	0	0	0	fullsib	Y		0.0000	14	pop0
-S0117	F054	S0477	S0103	1	fullsib	Y		0.0000	6	
-S0297	F054	S0103	S0477	1	fullsib	Y		0.0000	10	
-S0268	F054	S0103	S0477	1	fullsib	Y		0.0000	23	
-S0223	F055	0	0	0	fullsib	Y		0.0000	25	pop0
-S0052	F055	0	0	0	fullsib	Y		0.0000	24	pop1
-S0096	F055	S0223	S0052	1	fullsib	Y		0.0000	9	
-S0089	F055	S0223	S0052	1	fullsib	Y		0.0000	11	
-S0129	F055	S0223	S0052	1	fullsib	Y		0.0000	14	
-S0227	F055	S0052	S0223	1	fullsib	Y		0.0000	14	
-S0258	F055	S0223	S0052	1	fullsib	Y		0.0000	19	
-S0392	F042	S0262	S0262	7	hybrid	Y	S0013	0.5000	11	has_duplicate;inbred;is_duplicate;selfed
-S0135	F043	U0068	U0071	2	cryptic_cousins	Y	S0131	0.0000	16	has_duplicate;is_duplicate;parent_ungenotyped
-S0307	F039	S0235	S0004	1	inbred_mating	Y	S0180	0.0000	16	has_duplicate;is_duplicate
-S0169	F037	S0069	S0069	4	selfing	Y	S0278	0.9375	8	F5;has_duplicate;inbred;is_duplicate;selfed
-S0195	F009	S0332	S0066	1	cross_pop_trio	Y	S0240	0.0000	5	has_duplicate;is_duplicate
-S0457	F036	S0164	S0164	3	selfing	Y	S0061	0.8750	8	F4;has_duplicate;inbred;is_duplicate;selfed
-S0088	F028	S0466	S0283	1	backcross	Y	S0376	0.0000	22	F1;has_duplicate;is_duplicate
-S0449	F017	U0008	U0007	1	fullsib_noparents	Y	S0387	0.0000	20	has_duplicate;is_duplicate;parent_ungenotyped
-S0092	F041	S0210	S0474	7	hybrid	Y	S0419	0.4922	17	has_duplicate;inbred;is_duplicate;parents_are_relatives
-S0122	F026	S0031	S0144	2	multigen	Y	S0238	0.0000	172	has_duplicate;is_duplicate;low_callrate
-S0429	F053	0	0	0	random_multigen	Y	S0443	0.0000	24	has_duplicate;is_duplicate;pop1
-S0057	F032	S0192	S0139	2	backcross_other	Y	S0141	0.2500	14	has_duplicate;inbred;is_duplicate;parent_x_own_offspring
-S0063	F012	S0021	S0469	1	fullsib	Y	S0417	0.0000	4	has_duplicate;is_duplicate
-S0303	F018	S0045	S0441	1	large_sibship	Y	S0108	0.0000	7	has_duplicate;is_duplicate
-S0324	F026	S0196	S0296	2	multigen	Y	S0115	0.0000	27	has_duplicate;is_duplicate
-S0094	F049	0	0	0	random_multigen	Y	S0132	0.0000	10	has_duplicate;is_duplicate;pop2
-S0047	F039	S0032	S0075	3	inbred_mating	Y	S0260	0.0625	16	has_duplicate;inbred;is_duplicate
-S0274	F052	S0084	S0360	2	random_multigen	Y	S0304	0.0000	11	has_duplicate;is_duplicate
-S0399	F029	0	0	0	backcross	Y	S0375	0.0000	17	has_duplicate;is_duplicate;pop2
-S0363	F038	S0382	S0272	1	inbred_mating	Y	S0257	0.0000	26	has_duplicate;is_duplicate
-S0153	F026	S0144	S0334	4	multigen	Y	S0423	0.3750	13	has_duplicate;inbred;is_duplicate;parent_x_own_offspring
-S0435	F033	S0444	S0301	3	grandparent_cross	Y	S0209	0.1250	7	has_duplicate;inbred;is_duplicate
-S0211	F031	0	0	0	backcross	Y	S0481	0.0000	18	has_duplicate;is_duplicate;pop0
-S0414	F031	0	0	0	backcross	Y	S0481	0.0000	6	has_duplicate;is_duplicate;pop0
-S0136	F004	0	0	0	trio	Y	S0095	0.0000	12	has_duplicate;is_duplicate;pop1
-S0496	F007	0	0	0	cross_pop_trio	Y	S0081	0.0000	11	has_duplicate;is_duplicate;pop2
-S0016	F011	S0233	S0437	1	fullsib	Y	S0333	0.0000	9	has_duplicate;is_duplicate
-S0432	F011	0	0	0	fullsib	Y	S0437	0.0000	20	has_duplicate;is_duplicate;pop2
-S0118	F001	0	0	0	trio	Y	S0014	0.0000	17	has_duplicate;is_duplicate;pop1
-S0150	F011	0	0	0	fullsib	Y	S0437	0.0000	2	has_duplicate;is_duplicate;pop2
-S0124	F056	0	0	0	unrelated	Y		0.0000	6	pop0
-S0157	F057	0	0	0	unrelated	Y		0.0000	13	pop0
-S0357	F058	0	0	0	unrelated	Y		0.0000	4	pop2
-S0005	F059	0	0	0	unrelated	Y		0.0000	23	pop1
-S0126	F060	0	0	0	unrelated	Y		0.0000	13	pop1
-S0219	F061	0	0	0	unrelated	Y		0.0000	5	pop1
-S0421	F062	0	0	0	unrelated	Y		0.0000	21	pop2
-S0371	F063	0	0	0	unrelated	Y		0.0000	4	pop2
-S0337	F064	0	0	0	unrelated	Y		0.0000	1	pop2
-S0252	F065	0	0	0	unrelated	Y		0.0000	4	pop1
-S0409	F066	0	0	0	unrelated	Y		0.0000	20	pop0
-S0039	F067	0	0	0	unrelated	Y		0.0000	10	pop0
-S0044	F068	0	0	0	unrelated	Y		0.0000	9	pop1
-S0072	F069	0	0	0	unrelated	Y		0.0000	24	pop0
-S0322	F070	0	0	0	unrelated	Y		0.0000	15	pop0
-S0246	F071	0	0	0	unrelated	Y		0.0000	15	pop2
-S0163	F072	0	0	0	unrelated	Y		0.0000	16	pop1
-S0109	F073	0	0	0	unrelated	Y		0.0000	8	pop0
-S0176	F074	0	0	0	unrelated	Y		0.0000	14	pop2
-S0398	F075	0	0	0	unrelated	Y		0.0000	26	pop1
-S0156	F076	0	0	0	unrelated	Y		0.0000	6	pop2
-S0483	F077	0	0	0	unrelated	Y		0.0000	24	contaminated;pop1
-S0101	F078	0	0	0	unrelated	Y		0.0000	9	pop1
-S0123	F079	0	0	0	unrelated	Y		0.0000	4	pop1
-S0091	F080	0	0	0	unrelated	Y		0.0000	4	pop0
-S0142	F081	0	0	0	unrelated	Y		0.0000	3	pop1
+S0090	F053	S0443	S0461	2	random_multigen	Y		0.0000	39	
+S0410	F053	S0443	S0461	2	random_multigen	Y		0.0000	61	
+S0477	F054	0	0	0	fullsib	Y		0.0000	28	pop2
+S0103	F054	0	0	0	fullsib	Y		0.0000	40	pop0
+S0117	F054	S0477	S0103	1	fullsib	Y		0.0000	13	
+S0297	F054	S0103	S0477	1	fullsib	Y		0.0000	46	
+S0268	F054	S0103	S0477	1	fullsib	Y		0.0000	75	
+S0223	F055	0	0	0	fullsib	Y		0.0000	68	pop0
+S0052	F055	0	0	0	fullsib	Y		0.0000	50	pop1
+S0096	F055	S0223	S0052	1	fullsib	Y		0.0000	18	
+S0089	F055	S0223	S0052	1	fullsib	Y		0.0000	38	
+S0129	F055	S0223	S0052	1	fullsib	Y		0.0000	40	
+S0227	F055	S0052	S0223	1	fullsib	Y		0.0000	49	
+S0258	F055	S0223	S0052	1	fullsib	Y		0.0000	41	
+S0392	F042	S0262	S0262	7	hybrid	Y	S0013	0.5000	28	has_duplicate;inbred;is_duplicate;selfed
+S0135	F043	U0068	U0071	2	cryptic_cousins	Y	S0131	0.0000	30	has_duplicate;is_duplicate;parent_ungenotyped
+S0307	F039	S0235	S0004	1	inbred_mating	Y	S0180	0.0000	47	has_duplicate;is_duplicate
+S0169	F037	S0069	S0069	4	selfing	Y	S0278	0.9375	25	F5;has_duplicate;inbred;is_duplicate;selfed
+S0195	F009	S0332	S0066	1	cross_pop_trio	Y	S0240	0.0000	20	has_duplicate;is_duplicate
+S0457	F036	S0164	S0164	3	selfing	Y	S0061	0.8750	44	F4;has_duplicate;inbred;is_duplicate;selfed
+S0088	F028	S0466	S0283	1	backcross	Y	S0376	0.0000	41	F1;has_duplicate;is_duplicate
+S0449	F017	U0008	U0007	1	fullsib_noparents	Y	S0387	0.0000	60	has_duplicate;is_duplicate;parent_ungenotyped
+S0092	F041	S0210	S0474	7	hybrid	Y	S0419	0.4922	39	has_duplicate;inbred;is_duplicate;parents_are_relatives
+S0122	F026	S0031	S0144	2	multigen	Y	S0238	0.0000	516	has_duplicate;is_duplicate;low_callrate
+S0429	F053	0	0	0	random_multigen	Y	S0443	0.0000	92	has_duplicate;is_duplicate;pop1
+S0057	F032	S0192	S0139	2	backcross_other	Y	S0141	0.2500	33	has_duplicate;inbred;is_duplicate;parent_x_own_offspring
+S0063	F012	S0021	S0469	1	fullsib	Y	S0417	0.0000	12	has_duplicate;is_duplicate
+S0303	F018	S0045	S0441	1	large_sibship	Y	S0108	0.0000	25	has_duplicate;is_duplicate
+S0324	F026	S0196	S0296	2	multigen	Y	S0115	0.0000	62	has_duplicate;is_duplicate
+S0094	F049	0	0	0	random_multigen	Y	S0132	0.0000	41	has_duplicate;is_duplicate;pop2
+S0047	F039	S0032	S0075	3	inbred_mating	Y	S0260	0.0625	42	has_duplicate;inbred;is_duplicate
+S0274	F052	S0084	S0360	2	random_multigen	Y	S0304	0.0000	46	has_duplicate;is_duplicate
+S0399	F029	0	0	0	backcross	Y	S0375	0.0000	35	has_duplicate;is_duplicate;pop2
+S0363	F038	S0382	S0272	1	inbred_mating	Y	S0257	0.0000	61	has_duplicate;is_duplicate
+S0153	F026	S0144	S0334	4	multigen	Y	S0423	0.3750	28	has_duplicate;inbred;is_duplicate;parent_x_own_offspring
+S0435	F033	S0444	S0301	3	grandparent_cross	Y	S0209	0.1250	34	has_duplicate;inbred;is_duplicate
+S0211	F031	0	0	0	backcross	Y	S0481	0.0000	39	has_duplicate;is_duplicate;pop0
+S0414	F031	0	0	0	backcross	Y	S0481	0.0000	13	has_duplicate;is_duplicate;pop0
+S0136	F004	0	0	0	trio	Y	S0095	0.0000	30	has_duplicate;is_duplicate;pop1
+S0496	F007	0	0	0	cross_pop_trio	Y	S0081	0.0000	35	has_duplicate;is_duplicate;pop2
+S0016	F011	S0233	S0437	1	fullsib	Y	S0333	0.0000	35	has_duplicate;is_duplicate
+S0432	F011	0	0	0	fullsib	Y	S0437	0.0000	29	has_duplicate;is_duplicate;pop2
+S0118	F001	0	0	0	trio	Y	S0014	0.0000	54	has_duplicate;is_duplicate;pop1
+S0150	F011	0	0	0	fullsib	Y	S0437	0.0000	17	has_duplicate;is_duplicate;pop2
+S0124	F056	0	0	0	unrelated	Y		0.0000	14	pop0
+S0157	F057	0	0	0	unrelated	Y		0.0000	55	pop0
+S0357	F058	0	0	0	unrelated	Y		0.0000	10	pop2
+S0005	F059	0	0	0	unrelated	Y		0.0000	67	pop1
+S0126	F060	0	0	0	unrelated	Y		0.0000	37	pop1
+S0219	F061	0	0	0	unrelated	Y		0.0000	39	pop1
+S0421	F062	0	0	0	unrelated	Y		0.0000	62	pop2
+S0371	F063	0	0	0	unrelated	Y		0.0000	17	pop2
+S0337	F064	0	0	0	unrelated	Y		0.0000	14	pop2
+S0252	F065	0	0	0	unrelated	Y		0.0000	23	pop1
+S0409	F066	0	0	0	unrelated	Y		0.0000	44	pop0
+S0039	F067	0	0	0	unrelated	Y		0.0000	37	pop0
+S0044	F068	0	0	0	unrelated	Y		0.0000	33	pop1
+S0072	F069	0	0	0	unrelated	Y		0.0000	85	pop0
+S0322	F070	0	0	0	unrelated	Y		0.0000	57	pop0
+S0246	F071	0	0	0	unrelated	Y		0.0000	45	pop2
+S0163	F072	0	0	0	unrelated	Y		0.0000	44	pop1
+S0109	F073	0	0	0	unrelated	Y		0.0000	22	pop0
+S0176	F074	0	0	0	unrelated	Y		0.0000	44	pop2
+S0398	F075	0	0	0	unrelated	Y		0.0000	96	pop1
+S0156	F076	0	0	0	unrelated	Y		0.0000	24	pop2
+S0483	F077	0	0	0	unrelated	Y		0.0000	68	contaminated;pop1
+S0101	F078	0	0	0	unrelated	Y		0.0000	34	pop1
+S0123	F079	0	0	0	unrelated	Y		0.0000	8	pop1
+S0091	F080	0	0	0	unrelated	Y		0.0000	18	pop0
+S0142	F081	0	0	0	unrelated	Y		0.0000	30	pop1
