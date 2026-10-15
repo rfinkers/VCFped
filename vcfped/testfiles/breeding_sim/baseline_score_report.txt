@@ -1,0 +1,116 @@
+BASELINE SCORE REPORT: VCFped pipeline on the breeding_sim cohort (seed 42, 500 samples, 3000 SNPs)
+=====================================================================================================
+Produced 2026-10-15 with:
+    utilities/run_validation_pipeline.sh -o OUTDIR -j 9
+Environment: macOS, Python 3.13 with numpy 2.5 and numba 0.68, plink2 v2.00a5.9.
+NOT RUN in this baseline:
+  * BEAGLE / hap-IBD (no Java on the machine), so there is no IBD/HBD section and the refine step had no --ibd.
+  * PLINK2 --mendel (this plink2 rejects the flag; the runner replaced that step), so there is no Mendel scoring.
+Stage wall time: pairs 9 s, purge 5 s, trios about 20 min (9 workers), everything else seconds.
+One seed, one run: use it to see what changed after a code change (compare the numbers, or the
+JSON summary the scorer writes), not as a benchmark. Regenerate with the command above.
+-----------------------------------------------------------------------------------------------------
+
+Truth: vcfped/testfiles/breeding_sim/breeding_sim   samples scored: 500 of 500 genotyped (470 duplicate classes)
+
+1. Duplicate purge (what purge_mz_twins actually removed)
+=========================================================
+clusters 31 (mixed, i.e. merging distinct individuals: 5); samples removed 62
+  removals that were true duplicates   28/62 (45.2%)
+  removals of DISTINCT individuals     34   -> individuals lost from the trio stage: 32
+  duplicate classes still having >1 sample after purge: 0
+
+2. vcfped pairwise verdicts
+===========================
+MZ twins: true duplicate pairs called  32/32 (100.0%)
+         non-duplicate pairs called    185   (both members F>0.9: 152, one: 26, neither: 7)
+         non-duplicate calls by true relationship: unrelated 116, other 41, parent_offspring 17, grandparent 7, full_sib 3, first_cousin 1
+Parent-child: true simple PO pairs found  350/359 (97.5%)
+Parent-child: true inbred/multi-path PO pairs found  189/206 (91.7%)
+              calls that are not parent-offspring: 75   other 43, grandparent 24, avuncular 7, full_sib 1
+              simple full-sib pairs mistaken for parent-child  0/232 (0.0%)
+
+3. Trio stage (vcfped .trio)
+============================
+Outcome per truth child class (clone-equivalent parents accepted):
+  truth kind       n    regular_unique  regular_ambiguous  wrong_regular  inverted_only  missed  lost_by_purge  not_in_input  spurious_regular  correctly_empty
+  ---------------  ---  --------------  -----------------  -------------  -------------  ------  -------------  ------------  ----------------  ---------------
+  simple           156  138             10                 0              0              2       6              0             0                 0
+  inbred_child     10   3               0                  0              0              7       0              0             0                 0
+  related_parents  18   0               0                  0              0              9       9              0             0                 0
+  backcross        34   0               0                  1              0              33      0              0             0                 0
+  one_parent       26   0               0                  0              0              0       0              0             0                 26
+  selfed           39   0               0                  0              0              0       0              0             0                 39
+  no_parent        187  0               0                  0              0              0       0              0             2                 185
+  simple           recall (true pair among Regular calls)  148/156 (94.9%)   unique 138, ambiguous 10, inverted-only 0
+  inbred_child     recall (true pair among Regular calls)  3/10 (30.0%)   unique 3, ambiguous 0, inverted-only 0
+  related_parents  recall (true pair among Regular calls)  0/18 (0.0%)   unique 0, ambiguous 0, inverted-only 0
+  backcross        recall (true pair among Regular calls)  0/34 (0.0%)   unique 0, ambiguous 0, inverted-only 0
+  precision: Regular (child, parents) calls that are the true pair  151/173 (87.3%)
+
+4. Final pedigree (.fam parent assignments)
+===========================================
+Outcome per truth child class:
+  truth kind       n    correct  partial  wrong  unassigned  not_in_input  not_representable  correct_empty  spurious
+  ---------------  ---  -------  -------  -----  ----------  ------------  -----------------  -------------  --------
+  simple           156  145      3        3      5           0             0                  0              0
+  inbred_child     10   3        0        0      7           0             0                  0              0
+  related_parents  18   0        0        0      18          0             0                  0              0
+  backcross        34   0        1        0      33          0             0                  0              0
+  one_parent       26   0        0        0      0           0             26                 0              0
+  selfed           39   0        0        0      0           0             39                 0              0
+  no_parent        187  0        0        0      0           0             0                  185            2
+  simple           parents fully correct  145/156 (92.9%)
+  inbred_child     parents fully correct  3/10 (30.0%)
+  related_parents  parents fully correct  0/18 (0.0%)
+  backcross        parents fully correct  0/34 (0.0%)
+  precision: assigned children whose parent set is exactly right  148/157 (94.3%)
+  wrongly assigned parents are truly: parent_offspring 10, avuncular 2, half_sib 1, grandparent 1
+  fully-correct share by scenario (children with two genotyped parents):
+  scenario                  correct/n
+  ------------------------  ---------
+  backcross                 3/24
+  backcross_other           2/5
+  cross_pop_trio            3/3
+  cryptic_sibs_as_founders  4/4
+  cryptic_uncle_niece       0/2
+  fullsib                   25/25
+  grandparent_cross         7/12
+  halfsib                   7/7
+  hybrid                    0/15
+  inbred_mating             16/22
+  large_sibship             12/12
+  multigen                  32/45
+  multigen_gaps             6/6
+  random_multigen           17/22
+  role_switch               8/8
+  trio                      6/6
+
+5. KING kinship vs true relationships
+=====================================
+  true relationship  type    pairs  listed (>=0.0442)  in correct KING band  median KING
+  -----------------  ------  -----  -----------------  --------------------  -----------
+  duplicate          simple  24     100%               100%                  0.495
+  duplicate          inbred  8      100%                                     0.490
+  parent_offspring   simple  359    100%               99%                   0.238
+  parent_offspring   inbred  206    91%                                      0.246
+  full_sib           simple  232    100%               99%                   0.254
+  full_sib           inbred  65     71%                                      0.156
+  half_sib           simple  64     100%               95%                   0.127
+  half_sib           inbred  139    50%                                      0.109
+  grandparent        simple  148    70%                52%                   0.107
+  grandparent        inbred  134    32%                                      0.158
+  avuncular          simple  129    71%                69%                   0.122
+  avuncular          inbred  107    31%                                      0.095
+  first_cousin       simple  56     66%                59%                   0.066
+  first_cousin       inbred  62     5%                                       0.103
+KING pairs >= 0.0442 absent from the truth table (true kinship below 0.0442, or none): 255   3rd 246, <3rd 9
+IBS0 of simple parent_offspring 5th/50th/95th pct: 0.0000 / 0.0010 / 0.0024
+IBS0 of simple full_sib         5th/50th/95th pct: 0.0129 / 0.0200 / 0.0276
+
+6. Planted quality problems
+===========================
+check_genotype_quality: 500 samples, flagged for missingness 25, for heterozygosity 50  (rank-based, so ~5% are flagged by design)
+  planted low call rate flagged for missingness     4/4 (100.0%)
+  planted contaminated flagged for heterozygosity   1/2 (50.0%)
+Mendel artifact list is empty: no marker scoring (was --mendel available in this plink2?).

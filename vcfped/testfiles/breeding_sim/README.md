@@ -63,6 +63,10 @@ What it scores:
 Denominators use the original sample set, so anything the purge removes wrongly counts as a
 miss. Test it on a subset of families with `--samples subset.vcf`.
 
+`baseline_score_report.txt` is the report from one full run on this cohort (no BEAGLE/hap-IBD, no
+Mendel step: the header says what was and was not run). Compare a new run against it to see what a
+code change did.
+
 ## What is in the cohort
 
 Anonymous IDs (`S0001`…`S0500`), shuffled column order — nothing leaks through names or
