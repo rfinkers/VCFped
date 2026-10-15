@@ -7,8 +7,11 @@ real engine on 500 samples. Run with:
 
     pytest -m integration tests/test_breeding_sim_validation.py -v
 
-The full 500-sample trio stage takes too long without numba, so trios are scored on a
-~100-sample subset of whole families.
+The full 500-sample trio stage takes too long without numba, so by default trios are scored
+on a ~100-sample subset of whole families. Environment variables for bigger machines:
+
+    VCFPED_SIM_JOBS=32                  worker processes for vcfped (default 4)
+    VCFPED_SIM_TRIO_MAX_SAMPLES=500     score the whole cohort instead of a subset (default 100)
 
 The assertions are deliberately limited to what the engine does reliably on this
 cohort. Known weaknesses on it -- raw "MZ twins" over-calls between deeply selfed
@@ -28,6 +31,8 @@ pytestmark = [pytest.mark.integration, requires_numpy]
 
 SIM = os.path.join(TESTFILES_DIR, 'breeding_sim')
 VCF = os.path.join(SIM, 'breeding_sim.vcf.gz')
+JOBS = os.environ.get('VCFPED_SIM_JOBS', '4')
+TRIO_MAX_SAMPLES = int(os.environ.get('VCFPED_SIM_TRIO_MAX_SAMPLES', '100'))
 
 
 def _tsv(suffix):
@@ -53,7 +58,7 @@ def _run_vcfped(tmp_path_factory, label, extra):
     pytest.importorskip('tabulate')
     prefix = str(tmp_path_factory.mktemp(label) / 'out')
     result = run_module(['vcfped.vcfped_optimized', VCF, '--no-gender', '--quiet',
-                         '-o', prefix] + extra, timeout=1800)
+                         '-o', prefix] + extra, timeout=14400)
     assert result.returncode == 0, result.stderr
     return prefix
 
@@ -61,7 +66,7 @@ def _run_vcfped(tmp_path_factory, label, extra):
 @pytest.fixture(scope='module')
 def pair_calls(tmp_path_factory, sample_names):
     """{sorted (name1, name2): verdict} from vcfped's pairwise stage."""
-    prefix = _run_vcfped(tmp_path_factory, 'sim_pair', ['--no-trio', '-j', '4'])
+    prefix = _run_vcfped(tmp_path_factory, 'sim_pair', ['--no-trio', '-j', JOBS])
     calls = {}
     with open(prefix + '.pair', newline='') as f:
         for row in csv.DictReader(f, delimiter='\t'):
@@ -125,12 +130,16 @@ def trio_subset(tmp_path_factory):
     for r in truth:
         by_family[r['FID']].append(r)
     chosen, total = [], 0
-    for tag in SUBSET_TAGS:
-        for fid, members in by_family.items():
-            if fid not in chosen and any(m['SCENARIO'] == tag for m in members) and total + len(members) <= 100:
-                chosen.append(fid)
-                total += len(members)
-                break
+    if TRIO_MAX_SAMPLES >= len(truth):
+        chosen = list(by_family)
+    else:
+        for tag in SUBSET_TAGS:
+            for fid, members in by_family.items():
+                if (fid not in chosen and any(m['SCENARIO'] == tag for m in members)
+                        and total + len(members) <= TRIO_MAX_SAMPLES):
+                    chosen.append(fid)
+                    total += len(members)
+                    break
     keep = {m['ID'] for fid in chosen for m in by_family[fid]}
 
     work = tmp_path_factory.mktemp('sim_trio')
@@ -150,7 +159,7 @@ def trio_subset(tmp_path_factory):
     pytest.importorskip('tabulate')
     prefix = str(work / 'out')
     result = run_module(['vcfped.vcfped_optimized', subset_vcf, '--no-pairwise', '--no-gender',
-                         '--quiet', '-j', '4', '-o', prefix], timeout=1800)
+                         '--quiet', '-j', JOBS, '-o', prefix], timeout=14400)
     assert result.returncode == 0, result.stderr
     regular = collections.defaultdict(set)         # child -> {frozenset of parent names}
     with open(prefix + '.trio', newline='') as f:
