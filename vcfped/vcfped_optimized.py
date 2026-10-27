@@ -1354,6 +1354,13 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     conn, db_path = _open_results_db()
     GENDERRES = []
 
+    # Start the resource tracker BEFORE the workers fork. It starts lazily on
+    # the first SharedMemory registration, which here happens after the Pool
+    # exists; workers forked earlier then each start a private tracker when they
+    # attach to the segment, and at exit those trackers report it as leaked even
+    # though the parent unlinked it ("leaked shared_memory objects" / Errno 2).
+    from multiprocessing import resource_tracker
+    resource_tracker.ensure_running()
     pool = Pool(processes=n_jobs)
     try:
         for p in percentiles:
