@@ -39,6 +39,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.pytest_cache/
 nosetests.xml
 coverage.xml
 *,cover
@@ -59,3 +60,4 @@ target/
 # Magnus test files
 kast*.txt
 *.R
+.DS_Store
