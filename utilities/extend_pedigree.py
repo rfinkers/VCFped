@@ -955,13 +955,13 @@ def assess_strategy(up_candidates, down_candidates, n_founders, n_leaves,
         recs.append(
             "vcfped RERUN recommended: many candidates (>50). "
             "Extract candidate samples into a subset VCF and run:\n"
-            "  python -m vcfped.vcfped subset.vcf.gz "
+            "  python -m vcfped.archive.vcfped_original subset.vcf.gz "
             "--no-pairwise --no-gender --all -o extension_out\n"
             "This gives exact T1/T2 Mendelian scores for all candidate triples. "
-            "Use vcfped.py (not vcfped_optimized.py) and --all here: --all needs the "
-            "low-confidence rows (Not trio/Other) that vcfped_optimized.py's --all "
+            "Use the archived original (not vcfped.py) with --all here: --all needs the "
+            "low-confidence rows (Not trio/Other) that vcfped.py's --all "
             "path has a known, partially-confirmed scoring discrepancy for (see "
-            "vcfped_optimized.py's _is_better_pair_result()/_is_better_trio_result() "
+            "vcfped.py's _is_better_pair_result()/_is_better_trio_result() "
             "docstrings) -- the subset is small enough that the reference engine's "
             "lack of multiprocessing/JIT costs nothing here.")
 
@@ -1045,13 +1045,13 @@ def write_vcfped_candidates(path, up_candidates, down_candidates):
     with open(path, 'w') as f:
         f.write("# Sample list for VCF subsetting (bcftools view -S)\n")
         f.write("# Use: bcftools view -S this_file input.vcf.gz | bgzip > subset.vcf.gz\n")
-        f.write("# Then: python -m vcfped.vcfped subset.vcf.gz "
+        f.write("# Then: python -m vcfped.archive.vcfped_original subset.vcf.gz "
                 "--no-pairwise --no-gender --all -o extension_out\n")
-        f.write("# Use vcfped.py here, NOT vcfped_optimized.py: --all needs the low-\n"
-                "# confidence rows (Not trio/Other) that vcfped_optimized.py's --all path\n"
+        f.write("# Use the archived original here, NOT vcfped.py: --all needs the low-\n"
+                "# confidence rows (Not trio/Other) that vcfped.py's --all path\n"
                 "# has a known, partially-confirmed scoring discrepancy for (see\n"
-                "# vcfped_optimized.py's _is_better_pair_result()/_is_better_trio_result()\n"
-                "# docstrings). This subset is small enough that vcfped.py's lack of\n"
+                "# vcfped.py's _is_better_pair_result()/_is_better_trio_result()\n"
+                "# docstrings). This subset is small enough that the original's lack of\n"
                 "# multiprocessing/JIT costs nothing here.\n\n")
         f.write("# Samples needed:\n")
         for s in sorted(samples_needed):

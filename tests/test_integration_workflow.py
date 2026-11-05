@@ -39,8 +39,8 @@ import sys
 import pytest
 
 TESTFILES        = os.path.join(os.path.dirname(__file__), "..", "vcfped", "testfiles")
-VCFPED_PY        = os.path.join(os.path.dirname(__file__), "..", "vcfped", "vcfped.py")
-VCFPED_OPT_PY    = os.path.join(os.path.dirname(__file__), "..", "vcfped", "vcfped_optimized.py")
+VCFPED_PY        = os.path.join(os.path.dirname(__file__), "..", "vcfped", "archive", "vcfped_original.py")
+VCFPED_OPT_PY    = os.path.join(os.path.dirname(__file__), "..", "vcfped", "vcfped.py")
 UTILITIES        = os.path.join(os.path.dirname(__file__), "..", "utilities")
 
 VCF_PATH   = os.path.join(TESTFILES, "integration.vcf")
@@ -85,7 +85,7 @@ def ensure_test_files():
 
 
 def _vcfped_script():
-    """Return vcfped_optimized.py if numpy is available, else vcfped.py."""
+    """Return vcfped.py if numpy is available, else the archived original."""
     try:
         import numpy  # noqa: F401
         return VCFPED_OPT_PY
@@ -227,7 +227,7 @@ class TestStage1aVcfPed:
 
     def test_ped_validation_succeeds(self, tmp_path):
         """vcfped -ped must validate the ground-truth pedigree without error.
-        Note: --no-gender is incompatible with -ped in vcfped_optimized.py, so
+        Note: --no-gender is incompatible with -ped in vcfped.py, so
         gender analysis runs (produces empty result for chr1-only VCF) but vcfped
         must still exit 0 and validate the trio assignments that ARE found.
         """

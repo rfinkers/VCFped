@@ -1,15 +1,16 @@
 """
-Tests for vcfped/vcfped.py and vcfped/vcfped_optimized.py.
+Tests for vcfped/vcfped.py (maintained engine) and vcfped/archive/vcfped_original.py
+(archived pure-Python reference engine, kept to check that both agree).
 
 These run the bundled test VCF (HG002 child of HG003+HG004) through both
 engines and verify:
   - Known pedigree confirmation (-ped trio.ped -> "OK")
   - Pairwise / trio output values match expected ground truth
   - Both engines produce byte-identical results (regression guard — earlier
-    in development, vcfped_optimized.py had a missing-genotype bug and a
+    in development, the optimized engine had a missing-genotype bug and a
     trio-pivot-mislabelling bug that produced DIFFERENT results from
-    vcfped.py for the same input)
-  - gzip input support (vcfped_optimized.py only)
+    the original for the same input)
+  - gzip input support (vcfped.py only)
   - CLI flags (--no-gender, --no-pairwise, --no-trio) work
 """
 import os
@@ -19,17 +20,17 @@ import pytest
 from conftest import run_module, REPO_ROOT, HAS_NUMPY
 
 
-ENGINES = ['vcfped.vcfped', 'vcfped.vcfped_optimized']
+ENGINES = ['vcfped.archive.vcfped_original', 'vcfped.vcfped']
 
 
 def _skip_optimized_without_numpy(engine):
     """
-    vcfped_optimized.py has a hard `import numpy as np` (not wrapped in
+    vcfped.py has a hard `import numpy as np` (not wrapped in
     try/except, unlike numba/tqdm which DO degrade gracefully) — see
     CLAUDE.md. Skip cleanly rather than failing when numpy is absent.
     """
-    if engine == 'vcfped.vcfped_optimized' and not HAS_NUMPY:
-        pytest.skip("vcfped_optimized.py requires numpy (hard dependency)")
+    if engine == 'vcfped.vcfped' and not HAS_NUMPY:
+        pytest.skip("vcfped.py requires numpy (hard dependency)")
 
 
 @pytest.mark.parametrize('engine', ENGINES)
@@ -81,19 +82,19 @@ def test_trio_output_values(work_dir, test_vcf, engine):
 
 def test_engines_produce_identical_output(work_dir, test_vcf):
     """
-    Regression guard: vcfped.py and vcfped_optimized.py must produce
+    Regression guard: vcfped.py and the archived original must produce
     byte-identical .pair/.trio/.gender files for the same input.
     Catches the missing-genotype-handling bug and the trio pivot
     mislabelling bug found during development (different engines silently
     disagreeing on results is the worst possible failure mode here).
     """
     if not HAS_NUMPY:
-        pytest.skip("vcfped_optimized.py requires numpy (hard dependency)")
+        pytest.skip("vcfped.py requires numpy (hard dependency)")
     prefix_a = os.path.join(work_dir, 'orig')
     prefix_b = os.path.join(work_dir, 'opt')
 
-    result_a = run_module(['vcfped.vcfped', test_vcf, '-o', prefix_a, '-j', '2'])
-    result_b = run_module(['vcfped.vcfped_optimized', test_vcf, '-o', prefix_b, '-j', '2'])
+    result_a = run_module(['vcfped.archive.vcfped_original', test_vcf, '-o', prefix_a, '-j', '2'])
+    result_b = run_module(['vcfped.vcfped', test_vcf, '-o', prefix_b, '-j', '2'])
     assert result_a.returncode == 0, result_a.stderr
     assert result_b.returncode == 0, result_b.stderr
 
@@ -102,12 +103,12 @@ def test_engines_produce_identical_output(work_dir, test_vcf):
         assert os.path.exists(file_a), f"{file_a} missing"
         assert os.path.exists(file_b), f"{file_b} missing"
         assert filecmp.cmp(file_a, file_b, shallow=False), \
-            f"{ext} differs between vcfped.py and vcfped_optimized.py"
+            f"{ext} differs between vcfped.py and the archived original"
 
 
 def test_gzip_input_matches_plain(work_dir, test_vcf, test_vcf_gz):
     """
-    vcfped_optimized.py must produce identical results for .vcf and .vcf.gz
+    vcfped.py must produce identical results for .vcf and .vcf.gz
     input. Regression guard for an off-by-one bug found during development:
     the gzip header-skip logic originally processed one extra variant
     compared to the plain-text path (skipped only the header line, not also
@@ -115,13 +116,13 @@ def test_gzip_input_matches_plain(work_dir, test_vcf, test_vcf_gz):
     path skips).
     """
     if not HAS_NUMPY:
-        pytest.skip("vcfped_optimized.py requires numpy (hard dependency)")
+        pytest.skip("vcfped.py requires numpy (hard dependency)")
     prefix_plain = os.path.join(work_dir, 'plain')
     prefix_gz = os.path.join(work_dir, 'gz')
 
-    result_plain = run_module(['vcfped.vcfped_optimized', test_vcf,
+    result_plain = run_module(['vcfped.vcfped', test_vcf,
                                '-o', prefix_plain, '-j', '2'])
-    result_gz = run_module(['vcfped.vcfped_optimized', test_vcf_gz,
+    result_gz = run_module(['vcfped.vcfped', test_vcf_gz,
                             '-o', prefix_gz, '-j', '2'])
     assert result_plain.returncode == 0, result_plain.stderr
     assert result_gz.returncode == 0, result_gz.stderr
@@ -171,9 +172,9 @@ def test_log_states_best_of_percentiles_selection(work_dir, test_vcf, engine):
 
 
 @pytest.mark.parametrize('engine,gz', [
+    ('vcfped.archive.vcfped_original', False),
     ('vcfped.vcfped', False),
-    ('vcfped.vcfped_optimized', False),
-    ('vcfped.vcfped_optimized', True),   # vcfped.py has no gzip support
+    ('vcfped.vcfped', True),   # the archived original has no gzip support
 ])
 def test_every_pass_record_is_analysed(work_dir, engine, gz):
     """
@@ -228,7 +229,7 @@ def test_skip_flags(work_dir, test_vcf, engine, flag, missing_file):
 @pytest.mark.parametrize('engine', ENGINES)
 def test_jobs_flag_default_is_not_hardcoded(work_dir, test_vcf, engine):
     """
-    Regression guard: vcfped_optimized.py once had -j default hardcoded to 8
+    Regression guard: the optimized engine once had -j default hardcoded to 8
     instead of "all cores". Verify omitting -j still runs successfully
     (can't directly assert core count from output, but a crash here would
     indicate the default is broken).

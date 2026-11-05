@@ -143,7 +143,7 @@ def mz_twin_vcf(work_dir, test_vcf):
 def test_end_to_end_mz_twin_detection_and_purge(work_dir, mz_twin_vcf):
     # Step 1: pairwise-only run should detect HG003 == HG003_TWIN as MZ twins
     step1_prefix = os.path.join(work_dir, 'step1')
-    result = run_module(['vcfped.vcfped', mz_twin_vcf,
+    result = run_module(['vcfped.archive.vcfped_original', mz_twin_vcf,
                          '--no-trio', '--no-gender', '-o', step1_prefix, '-j', '2'])
     assert result.returncode == 0, result.stderr
     pair_file = f"{step1_prefix}.pair"
@@ -175,7 +175,7 @@ def test_end_to_end_mz_twin_detection_and_purge(work_dir, mz_twin_vcf):
 
 def test_dry_run_does_not_write_output(work_dir, mz_twin_vcf):
     step1_prefix = os.path.join(work_dir, 'step1')
-    result = run_module(['vcfped.vcfped', mz_twin_vcf,
+    result = run_module(['vcfped.archive.vcfped_original', mz_twin_vcf,
                          '--no-trio', '--no-gender', '-o', step1_prefix, '-j', '2'])
     assert result.returncode == 0, result.stderr
 
@@ -191,7 +191,7 @@ def test_dry_run_does_not_write_output(work_dir, mz_twin_vcf):
 def test_keep_first_vs_last(work_dir, mz_twin_vcf):
     """--keep first vs --keep last should retain different members of the MZ group."""
     step1_prefix = os.path.join(work_dir, 'step1')
-    result = run_module(['vcfped.vcfped', mz_twin_vcf,
+    result = run_module(['vcfped.archive.vcfped_original', mz_twin_vcf,
                          '--no-trio', '--no-gender', '-o', step1_prefix, '-j', '2'])
     assert result.returncode == 0, result.stderr
     pair_file = f"{step1_prefix}.pair"

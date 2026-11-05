@@ -114,7 +114,7 @@ if [[ -n "$HAPIBD_CMD" ]]; then       # wrapper so the generated script's hap-IB
 fi
 
 if begin pairs; then
-  "$PYTHON" -m vcfped.vcfped_optimized "$VCF" --no-trio --no-gender --quiet -j "$JOBS" -o "$OUT/step1"
+  "$PYTHON" -m vcfped.vcfped "$VCF" --no-trio --no-gender --quiet -j "$JOBS" -o "$OUT/step1"
   "$PYTHON" utilities/vcfped_rename_samples.py "$OUT/step1"
   end pairs
 fi
@@ -125,7 +125,7 @@ if begin purge; then
 fi
 
 if begin trios; then
-  "$PYTHON" -m vcfped.vcfped_optimized "$OUT/no_mz.vcf.gz" --no-pairwise --no-gender --quiet -j "$JOBS" -o "$OUT/step3"
+  "$PYTHON" -m vcfped.vcfped "$OUT/no_mz.vcf.gz" --no-pairwise --no-gender --quiet -j "$JOBS" -o "$OUT/step3"
   "$PYTHON" utilities/vcfped_rename_samples.py "$OUT/step3"
   end trios
 fi

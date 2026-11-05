@@ -3,7 +3,7 @@
 Purge MZ-twin duplicates from a VCF file based on VCFped .pair output.
 
 Two-stage workflow:
-  Stage 1: Run vcfped_optimized.py --no-trio --no-gender to identify MZ twins (fast, O(n^2)).
+  Stage 1: Run vcfped.py --no-trio --no-gender to identify MZ twins (fast, O(n^2)).
   Stage 2: Use this script to remove duplicate MZ-twin samples from the VCF,
            keeping one representative per MZ group. The reduced VCF is then
            suitable for trio analysis with far fewer combinations (O(n^3)).
@@ -11,7 +11,7 @@ Two-stage workflow:
 Usage:
   python purge_mz_twins.py <input.vcf[.gz]> <prefix.pair> -o <output.vcf[.gz]>
 
-The .pair file is the best-calls output from vcfped_optimized.py. This script:
+The .pair file is the best-calls output from vcfped.py. This script:
   1. Parses MZ-twin pairs from the .pair file
   2. Groups them transitively (if A=B and B=C, keeps only A)
   3. Reads sample names from the VCF header
@@ -104,7 +104,7 @@ def get_vcf_sample_info(vcf_file):
     """Read VCF header and return (header_lines, column_header_line, sample_names, format_col_idx).
 
     Handles both standard VCF (#CHROM) and non-standard (annotated) VCF files,
-    matching the logic in vcfped_optimized.py inspectFile().
+    matching the logic in vcfped.py inspectFile().
     """
     header_lines = []
     with smart_open(vcf_file) as f:
@@ -173,9 +173,9 @@ def main():
         description='Purge MZ-twin duplicates from a VCF file.',
         epilog="""
 Two-stage workflow:
-  Step 1: python -m vcfped.vcfped_optimized input.vcf.gz --no-trio --no-gender -o step1
+  Step 1: python -m vcfped.vcfped input.vcf.gz --no-trio --no-gender -o step1
   Step 2: python purge_mz_twins.py input.vcf.gz step1.pair -o input_no_mz.vcf.gz
-  Step 3: python -m vcfped.vcfped_optimized input_no_mz.vcf.gz --no-pairwise -o step3
+  Step 3: python -m vcfped.vcfped input_no_mz.vcf.gz --no-pairwise -o step3
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('vcf', help='Input VCF file (.vcf or .vcf.gz)')

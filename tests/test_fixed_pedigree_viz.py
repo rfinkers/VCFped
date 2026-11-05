@@ -251,7 +251,7 @@ def test_end_to_end_without_pair_file(work_dir, test_vcf, tmp_path):
     visualization must still succeed using only .trio."""
     from conftest import run_module
     prefix = os.path.join(work_dir, 'nopw')
-    result = run_module(['vcfped.vcfped_optimized', test_vcf,
+    result = run_module(['vcfped.vcfped', test_vcf,
                          '--no-pairwise', '-o', prefix, '-j', '2'])
     assert result.returncode == 0, result.stderr
     assert not os.path.exists(f"{prefix}.pair")

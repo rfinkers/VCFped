@@ -57,7 +57,7 @@ def sample_names():
 def _run_vcfped(tmp_path_factory, label, extra):
     pytest.importorskip('tabulate')
     prefix = str(tmp_path_factory.mktemp(label) / 'out')
-    result = run_module(['vcfped.vcfped_optimized', VCF, '--no-gender', '--quiet',
+    result = run_module(['vcfped.vcfped', VCF, '--no-gender', '--quiet',
                          '-o', prefix] + extra, timeout=14400)
     assert result.returncode == 0, result.stderr
     return prefix
@@ -158,7 +158,7 @@ def trio_subset(tmp_path_factory):
 
     pytest.importorskip('tabulate')
     prefix = str(work / 'out')
-    result = run_module(['vcfped.vcfped_optimized', subset_vcf, '--no-pairwise', '--no-gender',
+    result = run_module(['vcfped.vcfped', subset_vcf, '--no-pairwise', '--no-gender',
                          '--quiet', '-j', JOBS, '-o', prefix], timeout=14400)
     assert result.returncode == 0, result.stderr
     regular = collections.defaultdict(set)         # child -> {frozenset of parent names}

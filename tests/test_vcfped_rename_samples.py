@@ -44,7 +44,7 @@ def test_custom_suffix(vcfped_run):
 
 def test_inplace_overwrites_original(work_dir, test_vcf):
     prefix = os.path.join(work_dir, 'inplace_test')
-    result = run_module(['vcfped.vcfped', test_vcf,
+    result = run_module(['vcfped.archive.vcfped_original', test_vcf,
                          '-o', prefix, '-j', '2'])
     assert result.returncode == 0, result.stderr
 

@@ -8,10 +8,10 @@ dependencies:
   # ── Core vcfped dependency (required) ───────────────────────────────────────
   - tabulate
 
-  # ── vcfped_optimized.py: numpy is a HARD dependency (the genotype matrix
+  # ── vcfped.py: numpy is a HARD dependency (the genotype matrix
   #    is numpy-vectorized throughout — not an optional accelerator, unlike
   #    numba/tqdm below which DO have real try/except graceful fallback).
-  #    vcfped.py (the reference implementation) does not need numpy at all.
+  #    vcfped/archive/vcfped_original.py (the reference implementation) does not need numpy at all.
   - numpy
   - numba
   - tqdm

@@ -560,7 +560,7 @@ bcftools view -S prefix_vcfped_candidates.txt input.vcf.gz | bgzip > subset.vcf.
 tabix -p vcf subset.vcf.gz
 
 # Re-run vcfped on subset (fast — small N)
-python -m vcfped.vcfped_optimized subset.vcf.gz --no-pairwise --no-gender -o extension_out
+python -m vcfped.vcfped subset.vcf.gz --no-pairwise --no-gender -o extension_out
 python utilities/vcfped_rename_samples.py extension_out
 ```
 
@@ -629,7 +629,7 @@ extend_pedigree.py (refined.fam + king.kin0 + stat_ibd.ibd.gz)
     ↓
 [if vcfped rerun recommended]
   bcftools view -S vcfped_candidates.txt input.vcf.gz → subset.vcf.gz
-  python -m vcfped.vcfped_optimized subset.vcf.gz --no-pairwise --no-gender
+  python -m vcfped.vcfped subset.vcf.gz --no-pairwise --no-gender
     ↓
 Update .fam with confirmed grandparents / offspring
 Re-run Step 3b (pedigree-aware phasing) with extended .fam

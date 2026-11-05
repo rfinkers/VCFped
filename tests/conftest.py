@@ -48,7 +48,7 @@ def run_script(path, args, cwd=None, timeout=120, stdin_input=None):
 def run_module(module_args, cwd=None, timeout=300):
     """
     Run a vcfped package module via `python -m vcfped.<module>` (mirrors
-    documented usage), e.g. module_args=['vcfped.vcfped_optimized', 'file.vcf', '-o', 'out']
+    documented usage), e.g. module_args=['vcfped.vcfped', 'file.vcf', '-o', 'out']
     """
     cmd = [sys.executable, '-m'] + [str(a) for a in module_args]
     return subprocess.run(cmd, cwd=cwd or REPO_ROOT, capture_output=True,
@@ -110,7 +110,7 @@ def test_vcf_gz(work_dir, test_vcf):
 @pytest.fixture
 def vcfped_run(work_dir, test_vcf, test_ped):
     """
-    Run vcfped.py (the pure-Python reference engine) once on the bundled
+    Run the archived original (the pure-Python reference engine) once on the bundled
     trio test VCF and return the output prefix. Several test modules need
     this as a starting point (filter_trios, rename_samples,
     prepare_plink_beagle, fixed_pedigree_viz, etc.) — these utilities only
@@ -118,7 +118,7 @@ def vcfped_run(work_dir, test_vcf, test_ped):
     covered separately and thoroughly in test_vcfped_core.py, which tests
     both engines including their cross-engine agreement).
 
-    Deliberately uses vcfped.py rather than vcfped_optimized.py: the latter
+    Deliberately uses the archived original rather than vcfped.py: the latter
     has a hard numpy dependency (not optional, despite the genotype matrix
     machinery being framed as an "accelerator" — see CLAUDE.md), so using
     the original engine here keeps all downstream utility tests runnable
@@ -126,7 +126,7 @@ def vcfped_run(work_dir, test_vcf, test_ped):
     """
     prefix = os.path.join(work_dir, 'step3')
     result = run_module(
-        ['vcfped.vcfped', test_vcf, '-o', prefix, '-j', '2', '-ped', test_ped],
+        ['vcfped.archive.vcfped_original', test_vcf, '-o', prefix, '-j', '2', '-ped', test_ped],
     )
     assert result.returncode == 0, f"vcfped failed:\n{result.stdout}\n{result.stderr}"
     return prefix

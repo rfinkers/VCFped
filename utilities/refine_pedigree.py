@@ -58,12 +58,12 @@ Workflow:
   4. Report and write refined .trio + .fam.
 
 When to use additional strategies
-  • If KING screening finds many unresolved ambiguities → re-run vcfped.py
-    (NOT vcfped_optimized.py) with --all on the candidate subset (most
-    accurate T1/T2 scores). vcfped_optimized.py's --all path has a known,
+  • If KING screening finds many unresolved ambiguities → re-run the archived
+    original (vcfped.archive.vcfped_original, NOT vcfped.py) with --all on the
+    candidate subset (most accurate T1/T2 scores). vcfped.py's --all path has a known,
     partially-confirmed scoring discrepancy for low-confidence rows (Not
     trio/Other) -- see its _is_better_pair_result()/_is_better_trio_result()
-    docstrings. The subset is small enough that vcfped.py's lack of
+    docstrings. The subset is small enough that the original's lack of
     multiprocessing/JIT costs nothing here.
   • If hap-IBD output is available → use IBS segment patterns to distinguish
     PO (no Z2 segments) from full sibling (has Z2 segments).
@@ -1382,7 +1382,7 @@ Typical workflow:
     # itself — the inverted pool is never deduplicated per child upstream
     # (filter_trios.py only dedupes the Regular pool unless --include-inverted
     # is used there too, which has its own downstream risks — see
-    # _is_better_pair_result()'s TODO in vcfped_optimized.py for the analogous
+    # _is_better_pair_result()'s TODO in vcfped.py for the analogous
     # issue on the vcfped side). Children already assigned above are left
     # untouched: `results`-based regular-trio evidence outranks a
     # reclassified-inverted call. For children with multiple competing

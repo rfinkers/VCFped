@@ -9,8 +9,8 @@ Tool for identifying trios and close pairwise relationships in multisample VCF f
 
 ```
 vcfped/
-  vcfped.py                  # Original reference implementation
-  vcfped_optimized.py        # Shared memory + multiprocessing + Numba JIT + online best-tracking + gzip
+  vcfped.py                  # Maintained engine: shared memory + multiprocessing + Numba JIT + online best-tracking + gzip
+  archive/vcfped_original.py # Archived original reference implementation (pure Python); run as `python -m vcfped.archive.vcfped_original`
   checkped.py                # PED file validation
 utilities/
   purge_mz_twins.py          # Remove MZ-twin duplicates from VCF before trio analysis
@@ -41,9 +41,9 @@ setup.py                     # Package config (entry point: vcfped.vcfped:main)
 
 ## Dependencies
 
-- **Required for `vcfped.py`:** `tabulate`
-- **Required for `vcfped_optimized.py`:** `tabulate`, `numpy` (hard dependency — the genotype matrix is numpy-vectorized throughout, not an optional accelerator)
-- **Optional for `vcfped_optimized.py`:** `numba` (JIT acceleration), `tqdm` (progress bars) — these two have real try/except graceful fallback
+- **Required for `vcfped/archive/vcfped_original.py`:** `tabulate`
+- **Required for `vcfped.py`:** `tabulate`, `numpy` (hard dependency — the genotype matrix is numpy-vectorized throughout, not an optional accelerator)
+- **Optional for `vcfped.py`:** `numba` (JIT acceleration), `tqdm` (progress bars) — these two have real try/except graceful fallback
 - **Visualization utilities:** `pandas`, `plotly`
 - **Pedigree verification (PLINK2/BEAGLE workflow):** `plink2`, `beagle`, `king`, `bcftools`, `htslib` (tabix), `r-base` + `r-data.table` (+ `r-ggplot2` for IBD plots); `hap-ibd` has no conda package — download manually (see `environment.yml`)
 
@@ -51,7 +51,7 @@ Install everything with conda/mamba: `conda env create -f environment.yml && con
 
 ## Script version comparison
 
-| Aspect | vcfped.py | vcfped_optimized.py |
+| Aspect | archive/vcfped_original.py | vcfped.py |
 |---|---|---|
 | Vectorization | No | NumPy + optional Numba JIT |
 | Multiprocessing | `Pool`, all cores by default, `-j/--jobs` to override | Shared memory + adaptive batch `imap_unordered`, `-j/--jobs` to override |
@@ -63,14 +63,14 @@ Both scripts correctly handle missing genotypes (`-1`/`'-'`) by excluding them o
 per-pair / per-trio counts that involve them, never by dropping a variant globally just
 because some sample in the cohort has a missing call.
 
-**`--all` discrepancy:** `vcfped_optimized.py`'s online best-tracking collapses each pair/triple to
+**`--all` discrepancy:** `vcfped.py`'s online best-tracking collapses each pair/triple to
 one row per percentile *before* the final `--all`-specific selection logic runs, using a different
 tie-break rule than `bestPairs()`/`bestTrios()` apply afterward. This is confirmed (via diff against
-`vcfped.py`) to give a different reported percentile/score for `Other/unrelated` pairs under `--all`,
+`archive/vcfped_original.py`) to give a different reported percentile/score for `Other/unrelated` pairs under `--all`,
 and flagged as the same structural risk (not yet confirmed) for `Not trio` triples — see
 `_is_better_pair_result()`/`_is_better_trio_result()`'s docstrings. Everything else (MZ twins,
-Parent-child, and all non-`--all` output) is unaffected. **Use `vcfped.py`, not
-`vcfped_optimized.py`, for any `--all` run** (e.g. the candidate-subset rerun in the large-cohort
+Parent-child, and all non-`--all` output) is unaffected. **Use `vcfped.archive.vcfped_original`, not
+`vcfped.py`, for any `--all` run** (e.g. the candidate-subset rerun in the large-cohort
 workflow below) — those reruns are on a small subset, so the reference engine's lack of
 multiprocessing/JIT costs nothing.
 
@@ -129,8 +129,8 @@ approach for the cubic trio cost, trio pre-pruning, matrix formulation) are not 
 ```bash
 pip install -e .
 vcfped input.vcf -o output_prefix
-# or for gzipped (vcfped_optimized.py only):
-python -m vcfped.vcfped_optimized input.vcf.gz -o output_prefix
+# or for gzipped (vcfped.py only):
+python -m vcfped.vcfped input.vcf.gz -o output_prefix
 ```
 
 ## Two-stage workflow: MZ-twin purge then trio analysis
@@ -151,7 +151,7 @@ detection first, purge duplicates, then run trios on the reduced set.
 
 ```bash
 # Step 1: Identify MZ twins (pairwise only, fast)
-python -m vcfped.vcfped_optimized input.vcf.gz --no-trio --no-gender -o step1
+python -m vcfped.vcfped input.vcf.gz --no-trio --no-gender -o step1
 
 # Inspect results (optional dry run)
 python utilities/purge_mz_twins.py input.vcf.gz step1.pair -o /dev/null --dry-run
@@ -160,9 +160,9 @@ python utilities/purge_mz_twins.py input.vcf.gz step1.pair -o /dev/null --dry-ru
 python utilities/purge_mz_twins.py input.vcf.gz step1.pair -o input_no_mz.vcf.gz
 
 # Step 3: Run trio analysis on reduced VCF
-python -m vcfped.vcfped_optimized input_no_mz.vcf.gz --no-pairwise -o step3
+python -m vcfped.vcfped input_no_mz.vcf.gz --no-pairwise -o step3
 # For non-human samples (no X-linked variants), add --no-gender:
-python -m vcfped.vcfped_optimized input_no_mz.vcf.gz --no-pairwise --no-gender -o step3
+python -m vcfped.vcfped input_no_mz.vcf.gz --no-pairwise --no-gender -o step3
 ```
 
 ## Utilities
@@ -423,7 +423,7 @@ Outputs: `_extended.fam`, `_extension_report.txt`, `_vcfped_candidates.txt`, `_g
 
 Merges a candidate-subset refined FAM back into the full-cohort pedigree. For large cohorts,
 `extend_pedigree.py`'s own strategy recommendation is to extract candidate samples into a subset
-VCF and re-run `vcfped.py` (**not** `vcfped_optimized.py` — see Script version comparison below)
+VCF and re-run `vcfped.archive.vcfped_original` (**not** `vcfped.py` — see Script version comparison below)
 `--all` on just that subset (fast: O(k³) not O(N³)) for real T1/T2 verdicts, then `filter_trios.py`
 + `refine_pedigree.py` on the subset's output. That subset run's
 `_refined.fam` only ever contains individuals who got a confirmed parent-pair *during that run* —
@@ -751,11 +751,11 @@ KING/IBD-based steps can recover them. See `breeding_sim/README.md`.
 
 ```bash
 # Stage 1: MZ twin purge
-python -m vcfped.vcfped_optimized input.vcf.gz --no-trio --no-gender -o step1
+python -m vcfped.vcfped input.vcf.gz --no-trio --no-gender -o step1
 python utilities/purge_mz_twins.py input.vcf.gz step1.pair -o input_no_mz.vcf.gz
 
 # Stage 2: Trio analysis
-python -m vcfped.vcfped_optimized input_no_mz.vcf.gz --no-pairwise --no-gender -o step3
+python -m vcfped.vcfped input_no_mz.vcf.gz --no-pairwise --no-gender -o step3
 python utilities/vcfped_rename_samples.py step3
 
 # Stage 3: Post-processing
@@ -809,9 +809,9 @@ still valid and doesn't need regenerating.
 
 ```bash
 # Run with test files included in package
-python -m vcfped.vcfped_optimized vcfped/testfiles/trioHG002_22X.vcf -o test_out
+python -m vcfped.vcfped vcfped/testfiles/trioHG002_22X.vcf -o test_out
 # Validate against known pedigree
-python -m vcfped.vcfped_optimized vcfped/testfiles/trioHG002_22X.vcf -o test_out -ped vcfped/testfiles/trio.ped
+python -m vcfped.vcfped vcfped/testfiles/trioHG002_22X.vcf -o test_out -ped vcfped/testfiles/trio.ped
 ```
 
 ### Validation cohort with known ground truth
@@ -842,7 +842,7 @@ Structure (`tests/`):
 | File | Covers |
 |---|---|
 | `conftest.py` | Shared fixtures: bundled test VCF/PED, `vcfped_run` (pre-built vcfped output), dynamic module loader for the `utilities/` scripts (not an importable package) |
-| `test_vcfped_core.py` | Both engines against the bundled HG002/HG003/HG004 trio: known pedigree confirmation, exact `.pair`/`.trio` values, byte-identical cross-engine output, gzip input, CLI flags, every PASS record analysed in plain and `.vcf.gz` input (synthetic file with a known record count — regression guard for the dropped-first-record bug), log states "best of k percentile(s)", non-PASS records excluded |
+| `test_vcfped_core.py` | Both engines (`vcfped.py` and the archived original) against the bundled HG002/HG003/HG004 trio: known pedigree confirmation, exact `.pair`/`.trio` values, byte-identical cross-engine output, gzip input, CLI flags, every PASS record analysed in plain and `.vcf.gz` input (synthetic file with a known record count — regression guard for the dropped-first-record bug), log states "best of k percentile(s)", non-PASS records excluded |
 | `test_checkped.py` | PED file parsing and trio validation |
 | `test_purge_mz_twins.py` | MZ-twin grouping (transitive closure), VCF column purging, end-to-end detection+purge on a synthetic duplicate-sample VCF |
 | `test_filter_trios.py` | `best`/`strict`/`consensus` strategies, single-header-no-duplication regression |
@@ -863,9 +863,9 @@ Structure (`tests/`):
 | `test_breeding_sim_validation.py` | (`integration`) vcfped scored against the breeding cohort's truth: every true duplicate called MZ twins, simple parent-offspring recall, full sibs not mistaken for parent-offspring, false MZ calls confined to deeply inbred lines (printed, not locked in), and simple outbred trios found as `Regular trio` on a ~100-sample subset of whole families |
 | `test_score_against_truth.py` | Scorer and runner: a hand-built 15-sample truth with every expected number worked out (kind classification, fam outcomes incl. clone-equivalent parents and precision, trio unique/ambiguous/wrong/inverted/missed/spurious, purge losses counted as misses, pair verdicts, numeric-ID + `--log` resolution, KING bands incl. exact boundaries, quality plants, empty Mendel list skipped, IBD recall/false pairs/conserved block, HBD recovery, `--samples` restriction); the shipped truth scored against itself is perfect; runner syntax/help/required `-o`, and its `--stages score` glue and resume. Seven deliberate scorer bugs (clone equivalence, purge accounting, pair-order, min-cM, KING thresholds, ambiguity, lost classes) were each caught |
 
-Optional dependencies (`numpy`, `numba`, `tqdm`, `pandas`, `plotly`) are detected at collection time — tests requiring them skip cleanly rather than failing when absent (see `requires_pandas`/`requires_plotly`/`HAS_NUMPY` in `conftest.py`). Note: `vcfped_optimized.py` itself has a **hard** numpy dependency (not optional — see Dependencies above), so its tests in `test_vcfped_core.py` skip individually when numpy is unavailable while `vcfped.py`'s tests still run.
+Optional dependencies (`numpy`, `numba`, `tqdm`, `pandas`, `plotly`) are detected at collection time — tests requiring them skip cleanly rather than failing when absent (see `requires_pandas`/`requires_plotly`/`HAS_NUMPY` in `conftest.py`). Note: `vcfped.py` itself has a **hard** numpy dependency (not optional — see Dependencies above), so its tests in `test_vcfped_core.py` skip individually when numpy is unavailable while `vcfped.py`'s tests still run.
 
-Most utility tests use `vcfped.py` (not `vcfped_optimized.py`) to produce their input fixtures, since they only need *some* valid vcfped output — engine-specific correctness is covered exhaustively in `test_vcfped_core.py` alone.
+Most utility tests use the archived original (not `vcfped.py`) to produce their input fixtures, since they only need *some* valid vcfped output — engine-specific correctness is covered exhaustively in `test_vcfped_core.py` alone.
 
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.

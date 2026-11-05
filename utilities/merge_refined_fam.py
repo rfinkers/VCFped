@@ -9,8 +9,8 @@ The standard large-cohort extension workflow is:
   1. refine_pedigree.py on the full cohort -> <cohort>_refined.fam
      (founders = individuals with no confirmed parents yet)
   2. extend_pedigree.py on that FAM -> candidate grandparent/offspring lists
-  3. Extract candidate samples into a subset VCF and re-run vcfped.py (NOT
-     vcfped_optimized.py -- see that script's --all discrepancy note) --all
+  3. Extract candidate samples into a subset VCF and re-run the archived
+     original, vcfped.archive.vcfped_original (NOT vcfped.py -- see its --all discrepancy note) --all
      on just that subset (fast: O(k^3) not O(N^3)) to get real T1/T2 verdicts
   4. filter_trios.py + refine_pedigree.py on the SUBSET's vcfped output
      -> <subset>_refined.fam
