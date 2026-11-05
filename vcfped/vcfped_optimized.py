@@ -316,19 +316,25 @@ def all_variants(file, info, log, quiet):
     # Use larger buffer for faster I/O
     with _smart_open(file) as f:
         if file.endswith('.gz'):
-            for line in f:
-                if not line.startswith('#'):
-                    break
-            # Skip the first data line too, to match the non-gzip path
-            # (which always lands mid-way through the 1st variant after seek)
-            next(f, None)
+            # Scan past the header; the first data line is consumed by the scan,
+            # so put it back in front of the rest of the stream.
+            first_data_line = next((l for l in f if not l.startswith('#')), None)
+            lines = itertools.chain([first_data_line], f) if first_data_line is not None else iter(())
         else:
+            # startpos is the start of the 1st data line (see inspectFile), so no
+            # readline() here: that would silently drop the first record.
             f.seek(info['startpos'])
-            f.readline()
-        for line in f:
-            if 'PASS' not in line and '\t.\t' not in line: 
-                continue
+            lines = f
+        for line in lines:
             linesplit = line.split('\t')
+            # Accept FILTER = PASS or '.'. (The old test '\t.\t' in line also matched an
+            # ID or INFO of '.', letting non-PASS records through.) Non-standard layouts
+            # have no known FILTER column, so fall back to a substring test there.
+            if info['fileformat'] != 'Non-standard VCF':
+                if linesplit[6] not in ('PASS', '.'):
+                    continue
+            elif 'PASS' not in line and '\t.\t' not in line:
+                continue
             if 'Y' in linesplit[chromcol]:
                 continue
             GTtuple = getGTtuple(linesplit, firstSampleCol)
@@ -1291,6 +1297,7 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     _writeout(form.format('If sampling: Minimum with AA and BB', samplesizeAABB), log, quiet)
     _writeout(form.format('Filtering variables', ' '.join(variables)), log, quiet)
     _writeout(form.format('Filtering percentile ranks', ' '.join(map(str, percentiles))), log, quiet)
+    _writeout(form.format('Percentile selection', 'best of %d percentile(s) kept per pair/trio (more percentiles = more chances to cross a threshold)' % len(percentiles)), log, quiet)
     st = time.time()
     
     info = inspectFile(file, log=log, quiet=quiet)

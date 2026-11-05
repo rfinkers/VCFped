@@ -74,6 +74,56 @@ Parent-child, and all non-`--all` output) is unaffected. **Use `vcfped.py`, not
 workflow below) — those reruns are on a small subset, so the reference engine's lack of
 multiprocessing/JIT costs nothing.
 
+### Selection rules and known quirks
+
+`IDEAS.md` collects observations from an independent analysis in which vcfped was used
+successfully (12 runs, up to 424 samples; every output number was reproduced by a separate numpy
+implementation, so its points are about behaviour and design, not arithmetic). Its items were
+triaged against the code here; the status of each is below. Items marked *verified* were checked
+in this repo; the rest are taken from `IDEAS.md` as stated.
+
+How a result is selected (read from the code):
+- **Quality filter is site-level and cumulative.** Per site, `qualityDistrib()` keeps the *minimum*
+  QUAL/DP/GQ over all samples (and the minimum minor-allele AD ratio over heterozygous calls). A
+  site is therefore dropped when *any* sample fails the threshold, which becomes restrictive as the
+  sample count grows. The threshold at percentile `p` is `sorted(values)[int(p/100 * len)]`.
+- **`Autos`** is the number of autosomal sites left after the filter at that percentile.
+- **Best row over percentiles is kept** per pair/trio, so more `-p` values mean more chances to
+  cross a threshold; the log header now states this ("best of k percentile(s)"). The chosen
+  percentile is the `Perc` column. Thresholds (`-t1 -t2 -mz -po`) are printed in the log header only,
+  not in the `.pair`/`.trio` files, so scores from runs with different `-po` are not comparable
+  without checking each log.
+- **Genotype-level DP/GQ is not used.** Only the site-level filter above exists. For
+  plant/inbred material `IDEAS.md` recommends masking low-quality genotypes beforehand, e.g.
+  `bcftools +setGT -- -t q -n . -i 'FMT/DP<8 | FMT/GQ<20'` (recipe from `IDEAS.md`, not run here).
+  Missing genotypes are handled per pair/trio, so this does not discard sites.
+- **`Inverted/generational trio` only means T2 (BB×BB→BB) < `-t2` (default 95).** In inbred or
+  selfed material T2 rarely reaches 95%, so most trio calls can carry this label without any
+  reversed relationship (*verified* in the code; `IDEAS.md` reports 8061 of 8062 calls).
+  `-t2 0` makes every T1-passing trio "Regular". The label string is consumed by `filter_trios.py`,
+  `refine_pedigree.py`, `score_against_truth.py` and their tests, so it is documented rather than
+  renamed.
+- **A near-identical child of a selfing parent is reported as `MZ twins`** (`IDEAS.md`: 63 of 266
+  correct mother-child calls). `purge_mz_twins.py` removes whatever is called MZ, so a selfed
+  offspring can be purged as a "duplicate". `extend_pedigree.py`'s hap-IBD-validated
+  `_confirmed_duplicates.tsv` is the stricter test (see above); not yet addressed upstream of the purge.
+
+Fixed:
+- **First data record(s) were silently not analysed** (*verified*): plain files lost 1 record,
+  `.vcf.gz` lost 2, in both engines. Every run analysed 1-2 sites too few. Now all PASS records are
+  analysed; `Autos` for the bundled trio went from 1905 to 1906 with no other count changing.
+  Guarded by `test_every_pass_record_is_analysed` (synthetic file with a known record count; the
+  bundled VCF cannot catch this).
+
+- **`all_variants()` kept non-PASS records** (*verified*, found while checking; not in `IDEAS.md`).
+  The filter `'\t.\t' in line` was meant to accept FILTER=`.` but also matched an ID or INFO of `.`,
+  so e.g. a `LowQual` record with ID `.` passed (and `sample_variants()` accepted only `PASS`). Now the
+  FILTER column must be `PASS` or `.` (substring fallback only for non-standard layouts). Guarded by
+  `test_non_pass_records_are_excluded`.
+
+Other `IDEAS.md` items (genotype-level DP/GQ mask and per-sample QC block, candidate-parent
+approach for the cubic trio cost, trio pre-pruning, matrix formulation) are not implemented.
+
 ## Build and run
 
 ```bash
@@ -792,7 +842,7 @@ Structure (`tests/`):
 | File | Covers |
 |---|---|
 | `conftest.py` | Shared fixtures: bundled test VCF/PED, `vcfped_run` (pre-built vcfped output), dynamic module loader for the `utilities/` scripts (not an importable package) |
-| `test_vcfped_core.py` | Both engines against the bundled HG002/HG003/HG004 trio: known pedigree confirmation, exact `.pair`/`.trio` values, byte-identical cross-engine output, gzip input, CLI flags |
+| `test_vcfped_core.py` | Both engines against the bundled HG002/HG003/HG004 trio: known pedigree confirmation, exact `.pair`/`.trio` values, byte-identical cross-engine output, gzip input, CLI flags, every PASS record analysed in plain and `.vcf.gz` input (synthetic file with a known record count — regression guard for the dropped-first-record bug), log states "best of k percentile(s)", non-PASS records excluded |
 | `test_checkped.py` | PED file parsing and trio validation |
 | `test_purge_mz_twins.py` | MZ-twin grouping (transitive closure), VCF column purging, end-to-end detection+purge on a synthetic duplicate-sample VCF |
 | `test_filter_trios.py` | `best`/`strict`/`consensus` strategies, single-header-no-duplication regression |

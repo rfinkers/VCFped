@@ -58,8 +58,8 @@ def test_pairwise_output_values(work_dir, test_vcf, engine):
         content = f.read()
 
     # Both pairs (1,2) and (1,3) are confirmed Parent-child at Perc=10
-    assert '1,2\t10\t1905\t1194\t906\t75.9\t595\t595\t100.0\tParent-child' in content
-    assert '1,3\t10\t1905\t1127\t868\t77.0\t613\t613\t100.0\tParent-child' in content
+    assert '1,2\t10\t1906\t1194\t906\t75.9\t595\t595\t100.0\tParent-child' in content
+    assert '1,3\t10\t1906\t1127\t868\t77.0\t613\t613\t100.0\tParent-child' in content
 
 
 @pytest.mark.parametrize('engine', ENGINES)
@@ -76,7 +76,7 @@ def test_trio_output_values(work_dir, test_vcf, engine):
         content = f.read()
 
     # Sample 1 (HG002) is the pivot/child; T1=100.0%, T2=99.3%
-    assert '1,2,3\t1\t10\t1905\t136\t136\t100.0\t269\t267\t99.3\tRegular trio' in content
+    assert '1,2,3\t1\t10\t1906\t136\t136\t100.0\t269\t267\t99.3\tRegular trio' in content
 
 
 def test_engines_produce_identical_output(work_dir, test_vcf):
@@ -129,6 +129,84 @@ def test_gzip_input_matches_plain(work_dir, test_vcf, test_vcf_gz):
     for ext in ('.pair', '.trio', '.gender'):
         assert filecmp.cmp(f"{prefix_plain}{ext}", f"{prefix_gz}{ext}", shallow=False), \
             f"{ext} differs between plain and gzip input"
+
+
+@pytest.mark.parametrize('engine', ENGINES)
+def test_non_pass_records_are_excluded(work_dir, engine):
+    """
+    Regression guard: the old test `'\\t.\\t' in line` also matched an ID or
+    INFO of '.', so LowQual records leaked in. Only FILTER == PASS or '.' may
+    be analysed.
+    """
+    _skip_optimized_without_numpy(engine)
+    header = ("##fileformat=VCFv4.2\n"
+              "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1\ts2\ts3\n")
+    gts = "GT:DP:GQ\t0/0:30:50\t0/1:30:50\t1/1:30:50"
+    filters = ['PASS', 'PASS', '.', 'LowQual', 'LowQual', 'q10']
+    rows = "".join(f"1\t{100 + i}\t.\tA\tG\t50\t{flt}\t.\t{gts}\n"
+                   for i, flt in enumerate(filters))
+    path = os.path.join(work_dir, 'filters.vcf')
+    with open(path, 'w') as f:
+        f.write(header + rows)
+    prefix = os.path.join(work_dir, 'out')
+    result = run_module([engine, path, '-o', prefix, '-j', '1', '--no-gender',
+                         '--no-trio', '--all'])
+    assert result.returncode == 0, result.stderr
+    with open(f"{prefix}.pair") as f:
+        autos = {line.split('\t')[2] for line in f.read().splitlines()[1:]}
+    assert autos == {'3'}, f"analysed {autos} records; expected 3 (PASS, PASS, '.')"
+
+
+@pytest.mark.parametrize('engine', ENGINES)
+def test_log_states_best_of_percentiles_selection(work_dir, test_vcf, engine):
+    """The log header must say that the best row over the tried percentiles is
+    kept (more percentiles = more chances to cross a threshold)."""
+    _skip_optimized_without_numpy(engine)
+    prefix = os.path.join(work_dir, 'out')
+    result = run_module([engine, test_vcf, '-o', prefix, '-j', '1', '-p', '10', '50'])
+    assert result.returncode == 0, result.stderr
+    with open(f"{prefix}.log") as f:
+        log = f.read()
+    assert 'best of 2 percentile(s) kept per pair/trio' in log
+
+
+@pytest.mark.parametrize('engine,gz', [
+    ('vcfped.vcfped', False),
+    ('vcfped.vcfped_optimized', False),
+    ('vcfped.vcfped_optimized', True),   # vcfped.py has no gzip support
+])
+def test_every_pass_record_is_analysed(work_dir, engine, gz):
+    """
+    Regression guard: Autos (sites left after the quality filter) must equal
+    the number of PASS autosomal records in the file. Previously the first data
+    record was silently dropped (plain files) and the first TWO were dropped
+    (.vcf.gz), so every run analysed one or two variants too few. The bundled
+    HG002 trio cannot catch this (its first records do not change any count),
+    hence a synthetic file with a known number of records.
+    """
+    _skip_optimized_without_numpy(engine)
+    n_records = 12
+    header = ("##fileformat=VCFv4.2\n"
+              "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1\ts2\ts3\n")
+    rows = "".join(
+        f"1\t{100 + i}\t.\tA\tG\t50\tPASS\t.\tGT:DP:GQ\t0/0:30:50\t0/1:30:50\t1/1:30:50\n"
+        for i in range(n_records))
+    path = os.path.join(work_dir, 'known.vcf' + ('.gz' if gz else ''))
+    if gz:
+        import gzip
+        with gzip.open(path, 'wt') as f:
+            f.write(header + rows)
+    else:
+        with open(path, 'w') as f:
+            f.write(header + rows)
+
+    prefix = os.path.join(work_dir, 'out')
+    result = run_module([engine, path, '-o', prefix, '-j', '1', '--no-gender', '--no-trio',
+                         '--all'])  # 12 sites are too few for any verdict; --all lists every pair
+    assert result.returncode == 0, result.stderr
+    with open(f"{prefix}.pair") as f:
+        autos = {line.split('\t')[2] for line in f.read().splitlines()[1:]}
+    assert autos == {str(n_records)}, f"analysed {autos} of {n_records} PASS records"
 
 
 @pytest.mark.parametrize('engine', ENGINES)

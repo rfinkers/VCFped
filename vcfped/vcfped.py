@@ -231,12 +231,20 @@ def all_variants(file, info, log, quiet):
     XCHR = collections.defaultdict(list)
     AABB = 0
     with open(file, 'r') as f:
-        f.seek(info['startpos']) # in files with LF, this ends in the middle of the 1st var!
-        f.readline()
+        # startpos is the start of the 1st data line (see inspectFile), so no readline() here:
+        # that would silently drop the first record. (Only sample_variants, which seeks to
+        # random byte offsets, needs a readline() to realign to a line boundary.)
+        f.seek(info['startpos'])
         for line in f:
-            if not 'PASS' in line and not '\t.\t' in line: 
-                continue
             linesplit = line.split('\t')
+            # Accept FILTER = PASS or '.'. (The old test '\t.\t' in line also matched an
+            # ID or INFO of '.', letting non-PASS records through.) Non-standard layouts
+            # have no known FILTER column, so fall back to a substring test there.
+            if info['fileformat'] != 'Non-standard VCF':
+                if linesplit[6] not in ('PASS', '.'):
+                    continue
+            elif 'PASS' not in line and '\t.\t' not in line:
+                continue
             if 'Y' in linesplit[chromcol]:
                 continue
             GTtuple = getGTtuple(linesplit, firstSampleCol)
@@ -608,6 +616,7 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     _writeout(form.format('If sampling: Minimum with AA and BB', samplesizeAABB), log, quiet)
     _writeout(form.format('Filtering variables', ' '.join(variables)), log, quiet)
     _writeout(form.format('Filtering percentile ranks', ' '.join(map(str, percentiles))), log, quiet)
+    _writeout(form.format('Percentile selection', 'best of %d percentile(s) kept per pair/trio (more percentiles = more chances to cross a threshold)' % len(percentiles)), log, quiet)
     st = time.time()
     
     # inspect file and guess various format details.
