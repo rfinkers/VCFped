@@ -955,7 +955,8 @@ def assess_strategy(up_candidates, down_candidates, n_founders, n_leaves,
         recs.append(
             "vcfped RERUN recommended: many candidates (>50). "
             "Extract candidate samples into a subset VCF and run:\n"
-            "  python -m vcfped.archive.vcfped_original subset.vcf.gz "
+            "  bcftools view -S <candidates file> input.vcf.gz -Ov -o subset.vcf   # uncompressed: the archived original cannot read .vcf.gz\n"
+            "  python -m vcfped.archive.vcfped_original subset.vcf "
             "--no-pairwise --no-gender --all -o extension_out\n"
             "This gives exact T1/T2 Mendelian scores for all candidate triples. "
             "Use the archived original (not vcfped.py) with --all here: --all needs the "
@@ -1044,8 +1045,9 @@ def write_vcfped_candidates(path, up_candidates, down_candidates):
 
     with open(path, 'w') as f:
         f.write("# Sample list for VCF subsetting (bcftools view -S)\n")
-        f.write("# Use: bcftools view -S this_file input.vcf.gz | bgzip > subset.vcf.gz\n")
-        f.write("# Then: python -m vcfped.archive.vcfped_original subset.vcf.gz "
+        f.write("# Use: bcftools view -S this_file input.vcf.gz -Ov -o subset.vcf\n"
+                "# (uncompressed: the archived original cannot read .vcf.gz)\n")
+        f.write("# Then: python -m vcfped.archive.vcfped_original subset.vcf "
                 "--no-pairwise --no-gender --all -o extension_out\n")
         f.write("# Use the archived original here, NOT vcfped.py: --all needs the low-\n"
                 "# confidence rows (Not trio/Other) that vcfped.py's --all path\n"
