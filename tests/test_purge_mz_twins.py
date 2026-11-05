@@ -214,3 +214,73 @@ def test_keep_first_vs_last(work_dir, mz_twin_vcf):
     # HG003 appears before HG003_TWIN in the VCF column order
     assert kept_first == 'HG003'
     assert kept_last == 'HG003_TWIN'
+
+
+# ---------------------------------------------------------------------------
+# Heterozygosity guard: a selfed child / inbred line is not a duplicate
+# ---------------------------------------------------------------------------
+
+def _het_vcf(path, n_sites=40):
+    """parent: heterozygous at every other site; clone: identical to parent;
+    selfed: shares all alleles but is homozygous where the parent is het."""
+    rows = []
+    for i in range(n_sites):
+        parent = '0/1' if i % 2 == 0 else ('0/0' if i % 4 == 1 else '1/1')
+        selfed = ('0/0' if i % 8 < 4 else '1/1') if parent == '0/1' else parent
+        rows.append(f"1\t{100 + i}\t.\tA\tG\t.\t.\t.\tGT\t{parent}\t{parent}\t{selfed}\n")
+    path.write_text("##fileformat=VCFv4.2\n"
+                    "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tparent\tclone\tselfed\n"
+                    + "".join(rows))
+    return str(path)
+
+
+def test_sample_heterozygosity(tmp_path):
+    vcf = _het_vcf(tmp_path / "h.vcf")
+    het = pmz.sample_heterozygosity(vcf, 8, ['parent', 'clone', 'selfed'], {'parent', 'selfed'})
+    assert set(het) == {'parent', 'selfed'}          # only the requested samples
+    assert het['parent'] == pytest.approx(0.5)
+    assert het['selfed'] == 0.0
+
+
+def test_sample_heterozygosity_ignores_missing_and_phased(tmp_path):
+    vcf = tmp_path / "m.vcf"
+    vcf.write_text("##fileformat=VCFv4.2\n"
+                   "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tA\n"
+                   "1\t1\t.\tA\tG\t.\t.\t.\tGT:DP\t0|1:9\n"
+                   "1\t2\t.\tA\tG\t.\t.\t.\tGT\t./.\n"
+                   "1\t3\t.\tA\tG\t.\t.\t.\tGT\t1/1\n")
+    assert pmz.sample_heterozygosity(str(vcf), 8, ['A'], {'A'}) == {'A': 0.5}
+
+
+def test_filter_pairs_by_heterozygosity():
+    het = {'a': 0.20, 'b': 0.19, 'c': 0.10, 'z': 0.0}
+    kept, rejected = pmz.filter_pairs_by_heterozygosity(
+        [('a', 'b'), ('a', 'c'), ('z', 'z')], het, 0.9)
+    assert kept == [('a', 'b'), ('z', 'z')]          # both-zero het counts as equal
+    assert [(x, y) for x, y, _ in rejected] == [('a', 'c')]
+    assert rejected[0][2] == pytest.approx(0.5)
+    # exactly at the threshold is kept; 0 disables the check
+    assert pmz.filter_pairs_by_heterozygosity([('a', 'c')], het, 0.5)[1] == []
+    assert pmz.filter_pairs_by_heterozygosity([('a', 'c')], het, 0)[0] == [('a', 'c')]
+
+
+def test_purge_keeps_selfed_child_but_removes_clone(tmp_path):
+    vcf = _het_vcf(tmp_path / "h.vcf")
+    pair = tmp_path / "x.pair"
+    pair.write_text("Pair\tPerc\tAutos\tNeitherAA\tIBS2\tMZscore\tEitherBB\tIBS>0\tPOscore\tVerdict\n"
+                    "1,2\t10\t40\t1\t1\t99.0\t1\t1\t99.0\tMZ twins\n"
+                    "1,3\t10\t40\t1\t1\t95.0\t1\t1\t99.0\tMZ twins\n")
+    script = os.path.join(UTILITIES_DIR, 'purge_mz_twins.py')
+
+    out = tmp_path / "out.vcf"
+    r = run_script(script, [vcf, str(pair), '-o', str(out)])
+    assert r.returncode == 0, r.stderr
+    assert "ratio=0.00" in r.stdout
+    header = next(l for l in out.read_text().splitlines() if l.startswith('#CHROM'))
+    assert header.split('\t')[9:] == ['parent', 'selfed']      # clone gone, selfed child kept
+
+    out2 = tmp_path / "out2.vcf"
+    r = run_script(script, [vcf, str(pair), '-o', str(out2), '--min-het-ratio', '0'])
+    assert r.returncode == 0, r.stderr
+    header = next(l for l in out2.read_text().splitlines() if l.startswith('#CHROM'))
+    assert header.split('\t')[9:] == ['parent']                 # old behaviour: both purged

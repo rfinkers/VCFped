@@ -100,13 +100,19 @@ How a result is selected (read from the code):
 - **`Inverted/generational trio` only means T2 (BB×BB→BB) < `-t2` (default 95).** In inbred or
   selfed material T2 rarely reaches 95%, so most trio calls can carry this label without any
   reversed relationship (*verified* in the code; `IDEAS.md` reports 8061 of 8062 calls).
-  `-t2 0` makes every T1-passing trio "Regular". The label string is consumed by `filter_trios.py`,
+  `-t2 0` makes every T1-passing trio "Regular" (*verified* by `test_t2_threshold_controls_inverted_label`). The label string is consumed by `filter_trios.py`,
   `refine_pedigree.py`, `score_against_truth.py` and their tests, so it is documented rather than
   renamed.
 - **A near-identical child of a selfing parent is reported as `MZ twins`** (`IDEAS.md`: 63 of 266
   correct mother-child calls). `purge_mz_twins.py` removes whatever is called MZ, so a selfed
-  offspring can be purged as a "duplicate". `extend_pedigree.py`'s hap-IBD-validated
-  `_confirmed_duplicates.tsv` is the stricter test (see above); not yet addressed upstream of the purge.
+  offspring can be purged as a "duplicate". The label is kept (other scripts consume it); the purge now
+  has a guard instead: `purge_mz_twins.py --min-het-ratio` (default 0.9) only treats a pair as a duplicate
+  when min(het)/max(het) of the two samples is at least that value. *Measured* on `breeding_sim` (218
+  vcfped "MZ twins" pairs): true clones have ratio >= 0.97 (32/32 kept as duplicates), selfed children
+  of the sample they resemble <= 0.84 (17/17 protected), inbred-line look-alikes median 0.65. Distinct
+  individuals lost to the purge went from 32 to 15, no true duplicate missed. What is left are pairs of
+  inbred lines with equal heterozygosity, which this cannot separate; `extend_pedigree.py`'s
+  hap-IBD-validated `_confirmed_duplicates.tsv` is the stricter test (see above).
 
 Fixed:
 - **First data record(s) were silently not analysed** (*verified*): plain files lost 1 record,
@@ -172,6 +178,7 @@ python -m vcfped.vcfped input_no_mz.vcf.gz --no-pairwise --no-gender -o step3
 Removes MZ-twin duplicate samples from a VCF file; see the two-stage workflow above for usage. Options:
 
 - `--keep first|last` — which sample to retain per MZ group (default: `first`)
+- `--min-het-ratio R` — keep a pair apart (not a duplicate) when its heterozygosity ratio is < R (default 0.9; 0 = old behaviour); rejected pairs are listed in the output
 - `--dry-run` — report clusters and reduction stats without writing output
 - Supports `.vcf.gz` input and output
 - Handles transitive MZ clusters (A=B and B=C → keeps one of {A,B,C})
@@ -844,7 +851,7 @@ Structure (`tests/`):
 | `conftest.py` | Shared fixtures: bundled test VCF/PED, `vcfped_run` (pre-built vcfped output), dynamic module loader for the `utilities/` scripts (not an importable package) |
 | `test_vcfped_core.py` | Both engines (`vcfped.py` and the archived original) against the bundled HG002/HG003/HG004 trio: known pedigree confirmation, exact `.pair`/`.trio` values, byte-identical cross-engine output, gzip input, CLI flags, every PASS record analysed in plain and `.vcf.gz` input (synthetic file with a known record count — regression guard for the dropped-first-record bug), log states "best of k percentile(s)", non-PASS records excluded |
 | `test_checkped.py` | PED file parsing and trio validation |
-| `test_purge_mz_twins.py` | MZ-twin grouping (transitive closure), VCF column purging, end-to-end detection+purge on a synthetic duplicate-sample VCF |
+| `test_purge_mz_twins.py` | MZ-twin grouping (transitive closure), VCF column purging, end-to-end detection+purge on a synthetic duplicate-sample VCF, heterozygosity guard (per-sample het incl. missing/phased calls, ratio filter boundaries, selfed child kept vs clone purged, `--min-het-ratio 0`) |
 | `test_filter_trios.py` | `best`/`strict`/`consensus` strategies, single-header-no-duplication regression |
 | `test_vcfped_rename_samples.py` | Numeric-ID → sample-name substitution, `--inplace`, custom suffix |
 | `test_analyze_vcfped_pairs.py` | Smoke tests (requires pandas/numpy — skips cleanly if absent) |

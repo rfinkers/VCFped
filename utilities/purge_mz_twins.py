@@ -138,6 +138,56 @@ def get_vcf_sample_info(vcf_file):
     return header_lines, col_header, sample_names, format_col
 
 
+def sample_heterozygosity(vcf_file, format_col, sample_names, wanted):
+    """Fraction of heterozygous calls (among non-missing) for each sample in `wanted`.
+
+    Only the wanted sample columns are parsed. Returns {name: het_fraction}; a
+    sample without any non-missing call gets 0.0.
+    """
+    idx = {format_col + 1 + i: n for i, n in enumerate(sample_names) if n in wanted}
+    het = dict.fromkeys(idx.values(), 0)
+    called = dict.fromkeys(idx.values(), 0)
+    with smart_open(vcf_file) as f:
+        for line in f:
+            if line.startswith('#'):
+                continue
+            fields = line.rstrip('\n').split('\t')
+            for col, name in idx.items():
+                if col >= len(fields):
+                    continue
+                gt = fields[col].split(':', 1)[0].replace('|', '/')
+                a = gt.split('/')
+                if len(a) != 2 or '.' in a:
+                    continue
+                called[name] += 1
+                if a[0] != a[1]:
+                    het[name] += 1
+    return {n: (het[n] / called[n] if called[n] else 0.0) for n in idx.values()}
+
+
+def filter_pairs_by_heterozygosity(mz_pairs, het, min_ratio):
+    """Split MZ-twin pairs into (kept, rejected) by heterozygosity similarity.
+
+    vcfped calls a pair "MZ twins" on allele sharing alone. A selfed child of a
+    heterozygous parent shares almost everything with it but has about half its
+    heterozygosity, and two deeply inbred lines can look alike the same way;
+    a true duplicate has the same heterozygosity as its twin. A pair is
+    rejected when min(het)/max(het) < min_ratio. Returns (kept, rejected) with
+    rejected as (a, b, ratio). min_ratio <= 0 keeps everything.
+    """
+    if min_ratio <= 0:
+        return list(mz_pairs), []
+    kept, rejected = [], []
+    for a, b in mz_pairs:
+        hi, lo = max(het[a], het[b]), min(het[a], het[b])
+        ratio = lo / hi if hi > 0 else 1.0
+        if ratio < min_ratio:
+            rejected.append((a, b, ratio))
+        else:
+            kept.append((a, b))
+    return kept, rejected
+
+
 def purge_vcf(vcf_file, output_file, samples_to_remove, format_col):
     """Write a new VCF with specified sample columns removed."""
     # Read header to find which column indices to drop
@@ -184,6 +234,10 @@ Two-stage workflow:
                         help='Output VCF file (.vcf or .vcf.gz)')
     parser.add_argument('--keep', choices=['first', 'last'], default='first',
                         help='Which sample to keep per MZ group: first or last in VCF order (default: first)')
+    parser.add_argument('--min-het-ratio', type=float, default=0.9,
+                        help='Only treat a vcfped MZ-twin pair as a duplicate if the two samples have similar '
+                             'heterozygosity: min(het)/max(het) >= this value (default: 0.9; 0 disables). '
+                             'Protects selfed children and inbred lines that vcfped calls "MZ twins".')
     parser.add_argument('--dry-run', action='store_true',
                         help='Only report what would be removed, do not write output')
 
@@ -205,6 +259,22 @@ Two-stage workflow:
         sys.exit(0)
 
     print(f"Found {len(mz_pairs)} MZ-twin pair(s)")
+
+    if args.min_het_ratio > 0:
+        wanted = {s for pair in mz_pairs for s in pair}
+        het = sample_heterozygosity(args.vcf, format_col, vcf_samples, wanted)
+        mz_pairs, rejected = filter_pairs_by_heterozygosity(mz_pairs, het, args.min_het_ratio)
+        if rejected:
+            print(f"Kept {len(rejected)} pair(s) apart: heterozygosity ratio < {args.min_het_ratio} "
+                  f"(selfed child, inbred line or other near-identical but distinct sample):")
+            for a, b, ratio in sorted(rejected, key=lambda r: r[2])[:20]:
+                print(f"  {a} ({het[a]:.3f}) vs {b} ({het[b]:.3f})  ratio={ratio:.2f}")
+            if len(rejected) > 20:
+                print(f"  ... and {len(rejected) - 20} more")
+        if not mz_pairs:
+            print("No MZ twins left after the heterozygosity check. No filtering needed.")
+            sys.exit(0)
+        print(f"{len(mz_pairs)} pair(s) remain")
 
     # Group transitively
     groups = group_mz_twins(mz_pairs)

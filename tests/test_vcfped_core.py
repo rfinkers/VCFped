@@ -239,3 +239,24 @@ def test_jobs_flag_default_is_not_hardcoded(work_dir, test_vcf, engine):
     result = run_module([engine, test_vcf, '-o', prefix])
     assert result.returncode == 0, result.stderr
     assert os.path.exists(f"{prefix}.trio")
+
+
+@pytest.mark.parametrize('engine', ENGINES)
+def test_t2_threshold_controls_inverted_label(work_dir, test_vcf, engine):
+    """
+    'Inverted/generational trio' only means T2 (BB x BB -> BB) < -t2; it is not
+    evidence of a reversed relationship. The bundled trio has T2 = 99.3%:
+    -t2 100 relabels it, -t2 0 never does (documented in CLAUDE.md).
+    """
+    _skip_optimized_without_numpy(engine)
+
+    def verdict(t2):
+        prefix = os.path.join(work_dir, f'out_t2_{t2}')
+        result = run_module([engine, test_vcf, '-o', prefix, '-j', '1', '-t2', t2,
+                             '--no-pairwise', '--no-gender'])
+        assert result.returncode == 0, result.stderr
+        with open(f"{prefix}.trio") as f:
+            return [l.split('\t')[-1].strip() for l in f.read().splitlines()[1:]]
+
+    assert verdict('100') == ['Inverted/generational trio']
+    assert verdict('0') == ['Regular trio']
