@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  test-full:
+    name: Full test suite (all dependencies)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tabulate numpy numba tqdm pandas plotly pytest
+          pip install -e .
+      - name: Run test suite
+        run: pytest -v
+
+  test-minimal:
+    name: Minimal dependency suite (graceful-fallback check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install minimal dependencies only
+        run: |
+          python -m pip install --upgrade pip
+          pip install tabulate pytest
+          pip install -e .
+      - name: Run test suite (numpy/numba/tqdm/pandas/plotly absent)
+        run: pytest -v

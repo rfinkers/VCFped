@@ -44,30 +44,23 @@ try:
 except ImportError:  # run as a script: put the package directory on the path
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     import checkped
-import tqdm
+
+try:
+    from tqdm import tqdm
+    TQDM_AVAILABLE = True
+except ImportError:
+    TQDM_AVAILABLE = False
+    class tqdm:
+        def __init__(self, *args, **kwargs):
+            pass
+        def update(self, *args):
+            pass
+        def close(self):
+            pass
 
 # Hard coding coordinates of pseudo-autosomal regions on X (hg19)
 _PAR1_ = (60000, 2699521)
 _PAR2_ = (154931043, 155270561)
-
-
-def do_work(x):
-    time.sleep(x)
-    return x
-
-
-def progress():
-    time.sleep(3)  # Check progress after 3 seconds
-    print(f'total: {pbar.total} finish:{pbar.n}')
-
-
-def chunked_iterable(iterable, size):
-    it = iter(iterable)
-    while True:
-        chunk = list(itertools.islice(it, size))
-        if not chunk:
-            break
-        yield chunk
 
 
 def XminusPAR(linesplit, chromcol):
@@ -77,13 +70,15 @@ def XminusPAR(linesplit, chromcol):
     pos = float(linesplit[chromcol+1])
     par = _PAR1_[0] < pos < _PAR1_[1] or _PAR2_[0] < pos < _PAR2_[1]
     return not par
-  
+
+
 def _writeout(txt, log, quiet=False):
     if log:
         print(txt, file=log)
     if not quiet:
         print(txt)
-    
+
+
 def inspectFile(filename, log, quiet=False):
     _writeout("\n====FILE INFO====", log, quiet)
     _writeout("File path: " + os.path.abspath(filename), log, quiet)
@@ -93,19 +88,19 @@ def inspectFile(filename, log, quiet=False):
         preamble_firstline = f.readline().rstrip()
         line = preamble_firstline
         # Skip preamble lines
-        while line.startswith("##"): 
+        while line.startswith("##"):
             line = f.readline()
-        
+
         headers = line.rstrip().split('\t')
         startpos = f.tell()
         firstvar = f.readline().rstrip().split('\t')
-        
+
         if headers[0] == "#CHROM" and headers[5] == "QUAL" and headers[8] == 'FORMAT' and firstvar[8].startswith("GT"):
             if 'fileformat=' in preamble_firstline:
                 fileformat = preamble_firstline[preamble_firstline.index('=')+1:]
-            else: 
+            else:
                 fileformat = "Not stated in the first line, but looks like VCF format"
-            chromcol, qualcol, formatcol = 0,5,8
+            chromcol, qualcol, formatcol = 0, 5, 8
         else:
             try:
                 chromcol = next(i for i,h in enumerate(headers) if h.lower() in ("chr", "chrom", "chromosome"))
@@ -118,7 +113,7 @@ def inspectFile(filename, log, quiet=False):
             except:
                 qualcol = None
             fileformat = "Non-standard VCF"
-        
+
         _writeout("File format: " + fileformat, log, quiet)
         _writeout("Chromosome column [index]: %s [%d]" %(headers[chromcol], chromcol), log, quiet)
         _writeout("QUAL column [index]: %s [%d]" %(headers[qualcol], qualcol), log, quiet)
@@ -130,18 +125,18 @@ def inspectFile(filename, log, quiet=False):
         DPind = formatfields.index('DP') if 'DP' in formatfields else None
         GQind = formatfields.index('GQ') if 'GQ' in formatfields else None
         _writeout("Format fields: " + ", ".join(formatfields), log, quiet)
-        
+
         available_vars = [v for v,ind in zip(['QUAL','DP','GQ','AD'], [qualcol, DPind, GQind, ADind]) if ind is not None]
         _writeout("Available filtering variables: " + ", ".join(available_vars), log, quiet)
-        
+
         samples = headers[(formatcol + 1):]
         nSamples = len(samples)
-        
+
         _writeout("Number of samples: %d" % nSamples, log, quiet)
         _writeout("Sample names:", log, quiet)
         for i, s in enumerate(samples):
             _writeout('  %d: %s' %(i+1, s), log, quiet)
-        
+
         # Estimating the number of variants: If less than 2000, report exactly
         linecount = None
         skipsize = 2000
@@ -149,7 +144,7 @@ def inspectFile(filename, log, quiet=False):
             if f.readline() == '':
                 linecount = i
                 break
-            
+
         # If > 2000: Estimate variant count using mean line width of first 2000 
         if linecount is None:
             after_skip = f.tell()
@@ -160,18 +155,20 @@ def inspectFile(filename, log, quiet=False):
         else:
             counttype = "Exact"
             endpos = None
-        _writeout("%s variant count: %d" %(counttype,linecount), log, quiet)
-        
+        _writeout("%s variant count: %d" %(counttype, linecount), log, quiet)
+
     return dict(filename=filename, fileformat=fileformat, chromcol=chromcol, formatcol=formatcol, qualcol=qualcol, 
                 formatfields=formatfields, DPind=DPind, GQind=GQind, ADind=ADind, counttype=counttype, available_vars=available_vars,
                 linecount=linecount, samples=samples, nSamples=nSamples, startpos=startpos, endpos=endpos)
 
 _GT2AB_ = {'0/0':'AA', '0|0':'AA', '0/1':'AB', '0|1':'AB', '1|0':'AB', '1/1':'BB', '1|1':'BB'}                
+
+
 def getGTtuple(linesplit, firstSampleCol):
     # Mapping VCF genotypes to {AA, AB, BB}, anything else to '-'
     return tuple(_GT2AB_.get(gt[:3], '-') for gt in linesplit[firstSampleCol:])
-    
-        
+
+
 class Filter(object):
     def __init__(self, formatinfo, PASS=None, DPmin=None, GQmin=None, QUALmin=None, ADmin=None):
         self.nSamples=formatinfo['nSamples']
@@ -184,7 +181,7 @@ class Filter(object):
         self.GQmin=GQmin
         self.QUALmin=QUALmin
         self.ADmin=ADmin
-        
+
     def __str__(self):
         pss =  'PASS: ' + str(self.PASS)
         qual = 'QUAL >= %d' %self.QUALmin if self.QUALmin is not None else 'QUAL: NA'
@@ -192,25 +189,25 @@ class Filter(object):
         gq = 'GQ >= %d' %self.GQmin if self.GQmin is not None else 'GQ: NA'
         ad = 'ALT ratio: %d - %d' %(self.ADmin, 100-self.ADmin) if self.ADmin is not None else 'ALT ratio: NA'
         return '\n'.join([pss, qual, dp, gq, ad])
-        
+
     def filter(self):
         nSamples, qualcol, ADind, DPind, GQind = self.nSamples, self.qualcol, self.ADind, self.DPind, self.GQind
         PASS, QUALmin, DPmin, GQmin, ADmin = self.PASS, self.QUALmin, self.DPmin, self.GQmin, self.ADmin
         PASSind = qualcol + 1 if qualcol is not None else None
-        
+
         PASStest = PASS and PASSind is not None
-        QUALtest = QUALmin>0 and qualcol is not None
-        ADtest = ADmin > 0 and ADind is not None
-        DPtest = DPmin > 0 and DPind is not None
-        GQtest = GQmin > 0 and GQind is not None
+        QUALtest = QUALmin is not None and QUALmin > 0 and qualcol is not None
+        ADtest = ADmin is not None and ADmin > 0 and ADind is not None
+        DPtest = DPmin is not None and DPmin > 0 and DPind is not None
+        GQtest = GQmin is not None and GQmin > 0 and GQind is not None
 
         if ADmin is not None:
             ADlow = ADmin/100.0
             ADhigh = 1 - ADlow
-        
+
         split_it = ADtest or DPtest or GQtest
         pass_strings = ('PASS', '.')
-        
+
         def _tester(linesplit):
             """Define the function to be returned"""
             try:
@@ -228,15 +225,16 @@ class Filter(object):
                 return 1
             except Exception as e:
                 return 0
-        
+
         return _tester
+
 
 def all_variants(file, info, log, quiet):
     _writeout('\n====VARIANT SAMPLE (BEFORE FILTERING)====', log, quiet)
     chromcol = info['chromcol']
     firstSampleCol = info['formatcol'] + 1
     nSamples = info['nSamples']
-    
+
     AUTOSOM = collections.defaultdict(list)
     XCHR = collections.defaultdict(list)
     AABB = 0
@@ -246,15 +244,9 @@ def all_variants(file, info, log, quiet):
         # random byte offsets, needs a readline() to realign to a line boundary.)
         f.seek(info['startpos'])
         for line in f:
-            linesplit = line.split('\t')
-            # Accept FILTER = PASS or '.'. (The old test '\t.\t' in line also matched an
-            # ID or INFO of '.', letting non-PASS records through.) Non-standard layouts
-            # have no known FILTER column, so fall back to a substring test there.
-            if info['fileformat'] != 'Non-standard VCF':
-                if linesplit[6] not in ('PASS', '.'):
-                    continue
-            elif 'PASS' not in line and '\t.\t' not in line:
+            if not 'PASS' in line and not '\t.\t' in line: 
                 continue
+            linesplit = line.split('\t')
             if 'Y' in linesplit[chromcol]:
                 continue
             GTtuple = getGTtuple(linesplit, firstSampleCol)
@@ -266,15 +258,15 @@ def all_variants(file, info, log, quiet):
                 AUTOSOM[GTtuple].append(linesplit)
                 if 'AA' in GTtuple and 'BB' in GTtuple:
                     AABB += 1
-    
+
     if log or not quiet:
         AUTant = sum(len(v) for v in list(AUTOSOM.values()))
         Xant = sum(len(v) for v in list(XCHR.values()))
         summary = 'Using all PASS variants:\n %d autosomal (including %d with AA+BB)\n %d X-linked.'%(AUTant, AABB, Xant)
         _writeout(summary, log, quiet)
-    
+
     return AUTOSOM, XCHR
-    
+
 def sample_variants(file, maxsize, AABBsize, Xsize, info, log, quiet, chunks=4):
     _writeout('\n====VARIANT SAMPLE (BEFORE FILTERING)====', log, quiet)
     chromcol = info['chromcol']
@@ -283,7 +275,7 @@ def sample_variants(file, maxsize, AABBsize, Xsize, info, log, quiet, chunks=4):
     randint = random.randint
     def _randpos():
         return randint(startpos, endpos)
-    
+
     AUTOSOM = collections.defaultdict(list)
     XCHR = collections.defaultdict(list)
     total, AUTant, Xant, AABB = 0, 0, 0, 0
@@ -292,7 +284,7 @@ def sample_variants(file, maxsize, AABBsize, Xsize, info, log, quiet, chunks=4):
             total += 1
             f.seek(_randpos())
             f.readline() # Skip current line (because we might be in the middle of a line)
-        
+
             for _ in range(chunks):
                 line = f.readline()
                 while line and 'PASS' not in line:  # avoiding EOF infinite loop
@@ -314,9 +306,10 @@ def sample_variants(file, maxsize, AABBsize, Xsize, info, log, quiet, chunks=4):
                     if 'AA' in GTtuple and 'BB' in GTtuple:
                         AABB += 1
     _writeout('Sampled random variants:\n %d autosomal variants (including %d with AA+BB)\n %d on X.'%(AUTant, AABB, Xant), log, quiet)
-     
+
     return AUTOSOM, XCHR
-        
+
+
 def qualityDistrib(variantlines, formatinfo, variables=['QUAL', 'DP', 'GQ', 'AD']):
     if isinstance(variantlines, dict):
         variantlines = itertools.chain(*list(variantlines.values()))
@@ -327,12 +320,12 @@ def qualityDistrib(variantlines, formatinfo, variables=['QUAL', 'DP', 'GQ', 'AD'
     qualcol = formatinfo['qualcol'] if 'QUAL' in useVariables else None
     firstSampleCol = formatinfo['formatcol'] + 1
     distrib_data = collections.defaultdict(list)
-    
+
     def _ALTratio(ADfield):
         ad0, ad1 = list(map(float, ADfield.split(',')))
         rat = ad1/(ad0+ad1)
         return round(min(rat, 1-rat) * 100, 1)
-    
+
     hets = ('0/1', '0|1', '1/0', '1|0')
     for s in variantlines:
         try:
@@ -340,7 +333,7 @@ def qualityDistrib(variantlines, formatinfo, variables=['QUAL', 'DP', 'GQ', 'AD'
             gtcols = [a.split(':') for a in s[firstSampleCol:]]
             if DPind: distrib_data['DP'].append(min(int(b[DPind]) for b in gtcols))
             if GQind: distrib_data['GQ'].append(min(int(b[GQind]) for b in gtcols))
-            if ADind: 
+            if ADind:
                 ad = [_ALTratio(b[ADind]) for b in gtcols if b[0] in hets]
                 if ad:
                     distrib_data['AD'].append(min(ad))
@@ -353,52 +346,54 @@ def qualityDistrib(variantlines, formatinfo, variables=['QUAL', 'DP', 'GQ', 'AD'
             #    if ADind and b[0] in hets: distrib_data['AD'].append(_ALTratio(b[ADind]))
         except Exception as e:
             continue
-    
+
     for key in distrib_data:
         distrib_data[key].sort()
     return distrib_data
-    
+
+
 def qualityPercentile(distrib_data, p, log, quiet):
     if isinstance(p, list):
         res = {key : [data[int(pp/100.0*len(data))] for pp in p] for key,data in distrib_data.items()}
     else:
         res = {key : data[int(p/100.0*len(data))] for key,data in distrib_data.items()}
-        
+
     if log or not quiet:
         _writeout("\n====SCORE PERCENTILES (%s)====" % ", ".join(map(str, p)), log, quiet)
         rows = ["  %s: %s" % (key, res[key]) for key in ['QUAL', 'DP', 'GQ', 'AD'] if key in res]
         _writeout('\n'.join(rows), log, quiet)
-    
+
     return res
-    
+
+
 def checkTriple(AUTOSOMfilt, triple, percentile, T1_thresh, T2_thresh):
     # AUTOSOMfilt: dictionary. Keys are tuples (GT1, GT2, ...) whose value is a list of all variants with that gt combo.
     # percentile is just for book-keeping in output
-    
+
     distr = collections.Counter()
     g = operator.itemgetter(*triple)
     for k,v in AUTOSOMfilt.items():
         if '-' in g(k): continue
         distr[g(k)] += len(v)
-    SURV = sum(distr.values()) 
-    
+    SURV = sum(distr.values())
+
     testresults = []
     # test each permutation:
-    for order in [(2,0,1), (1,2,0), (0,1,2)]:
+    for order in [(2, 0, 1), (1, 2, 0), (0, 1, 2)]:
         pivot = triple[order.index(2)]
         _perm = operator.itemgetter(*order)
-        
+
         # test 1: AA + BB = AB
         tot_AA_BB = sum(distr[_perm(['AA', 'BB', _])] for _ in ('AA','AB','BB')) + \
                     sum(distr[_perm(['BB', 'AA', _])] for _ in ('AA','AB','BB'))
         AA_BB_AB = distr[_perm(['AA','BB','AB'])]+distr[_perm(['BB','AA','AB'])]
         AA_BB_ABp = round(100.0 * AA_BB_AB / tot_AA_BB, 2) if tot_AA_BB > 0 else 0
-        
+
         # test 2: BB + BB = BB
         tot_BB_BB = sum(distr[_perm(['BB', 'BB', _])] for _ in ('AA','AB','BB'))
         BB_BB_BB = distr[('BB','BB','BB')] 
         BB_BB_BBp = round(100.0 * BB_BB_BB/tot_BB_BB, 2) if tot_BB_BB > 0 else 0
-                
+
         if tot_AA_BB>=100: # TODO: should this be user argument?
             if AA_BB_ABp >= T1_thresh:
                 verdict = 'Regular trio' if BB_BB_BBp >= T2_thresh else 'Inverted/generational trio'
@@ -411,6 +406,7 @@ def checkTriple(AUTOSOMfilt, triple, percentile, T1_thresh, T2_thresh):
         testresults.append(result_dict)
     return testresults
 
+
 def checkPair(AUTOSOMfilt, pair, percentile, MZ_thresh=95, PO_thresh=99):
     testresults = []
     distr = collections.Counter()
@@ -419,17 +415,17 @@ def checkPair(AUTOSOMfilt, pair, percentile, MZ_thresh=95, PO_thresh=99):
         if '-' in g(k): continue
         distr[g(k)] += len(v)
     autos_total = sum(distr.values()) 
-    
+
     # MZ score = freq(IBS=2 | none are AA)
     neitherAA = distr[('AB','AB')] + distr[('AB', 'BB')] + distr[('BB','AB')] + distr[('BB', 'BB')]
     IBS2_neitherAA = distr[('AB','AB')] + distr[('BB', 'BB')]
-    MZp = 100.0 * IBS2_neitherAA/neitherAA if neitherAA>0 else 0
-        
+    MZp = 100.0 * IBS2_neitherAA/neitherAA if neitherAA > 0 else 0
+
     # Parent-offspring test: PO score = freq(IBS>0 | either is BB)
     eitherBB = distr[('AA','BB')] + distr[('BB', 'AA')] + distr[('AB','BB')] + distr[('BB','AB')] + distr[('BB','BB')]
     IBS12 = eitherBB - distr[('AA','BB')] - distr[('BB', 'AA')]
     POp = 100.0 * IBS12/eitherBB if eitherBB>0 else 0
-    
+
     if neitherAA >= 100 and MZp >= MZ_thresh:
         verdict = 'MZ twins'
     elif eitherBB >= 100 and POp >= PO_thresh:
@@ -438,8 +434,9 @@ def checkPair(AUTOSOMfilt, pair, percentile, MZ_thresh=95, PO_thresh=99):
         verdict = 'Other/unrelated'
     else:
         verdict ='na'
-    
+
     return dict(pair=pair, percentile=percentile, autos=autos_total, neitherAA=neitherAA, IBS2=IBS2_neitherAA, MZp=MZp, eitherBB=eitherBB, IBS12=IBS12, POp=POp, verdict=verdict)
+
 
 def inferGenders(XCHRfilt, formatinfo, percentile, FEMALE_thresh, MALE_thresh):
     nSamples = formatinfo['nSamples']
@@ -449,8 +446,8 @@ def inferGenders(XCHRfilt, formatinfo, percentile, FEMALE_thresh, MALE_thresh):
         nvars = len(lines)
         Xtot += nvars
         for i, gt in enumerate(gtcomb):
-            Xdistribs[i][gt] += nvars 
-    
+            Xdistribs[i][gt] += nvars
+
     common = dict(percentile=percentile, Xtot=Xtot)
     def dist2gender(Xdist):
         denom = Xdist['AB']+Xdist['BB']
@@ -464,14 +461,14 @@ def inferGenders(XCHRfilt, formatinfo, percentile, FEMALE_thresh, MALE_thresh):
                 gender = 'Female' 
         else: gender = 'na'
         return dict(Xhetp=Xhetp, gender=gender)
-    
+
     res = []
     for i, Xdist in enumerate(Xdistribs):
         r = dist2gender(Xdist)
-        ## adding other info. Note AA,AB,BB: if absent, they default to 0.
+        # adding other info. Note AA,AB,BB: if absent, they default to 0.
         r.update(dict(sample=i, AA=Xdist['AA'], AB=Xdist['AB'], BB=Xdist['BB'], **common))
         res.append(r)
-    
+
     return res
     
 def trio_table(TRIORES):
@@ -485,7 +482,8 @@ def trio_table(TRIORES):
                                test1, d['tot_BB_BB'], d['BB_BB_BB'], test2, d['verdict']]
         table.append(printdat)
     return table
-    
+
+
 def pairwise_table(PAIRRES):
     table = [['Pair', 'Perc', 'Autos', 'NeitherAA', 'IBS2', 'MZscore', 'EitherBB', 'IBS>0', 'POscore', 'Verdict']]
     for d in PAIRRES:
@@ -495,7 +493,8 @@ def pairwise_table(PAIRRES):
         printdat = [pair_txt, d['percentile'], d['autos'], d['neitherAA'], d['IBS2'], MZscore, d['eitherBB'], d['IBS12'], POscore, d['verdict']]
         table.append(printdat)
     return table
-    
+
+
 def gender_table(GENDERRES):
     table = [['Sample', 'Perc', 'Xvars', 'AA', 'AB', 'BB', 'Xhet', 'Gender']]
     for d in GENDERRES:
@@ -503,7 +502,8 @@ def gender_table(GENDERRES):
         printdat = [d['sample']+1, d['percentile'], d['Xtot'], d['AA'], d['AB'], d['BB'], XHET, d['gender']]
         table.append(printdat)
     return table
-    
+
+
 def bestTrios(triodata, reportall):
     best = []
     for k,v in itertools.groupby(triodata, key=lambda x: x['triple']):
@@ -517,9 +517,10 @@ def bestTrios(triodata, reportall):
         b = nonNA[0]
         if b['verdict'][:3] in ('Reg', 'Inv')  or reportall: 
             best.append(b)
-    
+
     return trio_table(best)
-    
+
+
 def bestPairs(pairdata, reportall):
     best = []
     for k,v in itertools.groupby(pairdata, key=lambda x: x['pair']):
@@ -537,8 +538,9 @@ def bestPairs(pairdata, reportall):
         else:
             continue
         best.append(nonNA[0])
-    
+
     return pairwise_table(best)
+
 
 def bestGenders(genderdata):
     best = []
@@ -561,20 +563,39 @@ def bestGenders(genderdata):
             verd = list(verdicts.difference({'?'}))[0]
         use = sorted([r for r in noNA if r['gender'] == verd], key=sortfun)
         best.append(use[0])
-    
+
     return gender_table(best)
-        
+
+
 def checkPair_worker(args):
     autosom_filt, pair, percentile, MZ_thresh, PO_thresh = args
     return checkPair(autosom_filt, pair, percentile, MZ_thresh, PO_thresh)
+
 
 def checkTriple_worker(args):
     autosom_filt, triple, percentile, T1_thresh, T2_thresh = args
     return checkTriple(autosom_filt, triple, percentile, T1_thresh, T2_thresh)
 
-def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP','GQ','AD'], percentiles=[10,30,50], 
+
+def _default_n_jobs(n_jobs, total_cores):
+    """Resolve the worker pool size.
+
+    An explicit -j/--jobs always wins. Otherwise, on machines with more than
+    8 CPUs, cap the default at 25% of the core count rather than claiming
+    every core — avoids oversubscribing shared/multi-tenant hosts when no
+    thread budget was requested.
+    """
+    if n_jobs is not None:
+        return max(1, n_jobs)
+    if total_cores > 8:
+        return max(1, round(total_cores * 0.25))
+    return total_cores
+
+
+def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP','GQ','AD'], percentiles=[10,30,50],
            T1_thresh=90, T2_thresh=95, MZ_thresh=95, PO_thresh=99, MALE_thresh=5, FEMALE_thresh=25, pedfile=None,
-           nogender=False, nopairwise=False, notrio=False, exactmax=150000, samplesize=10000, samplesizeAABB=500):
+           nogender=False, nopairwise=False, notrio=False, exactmax=150000, samplesize=10000, samplesizeAABB=500,
+           n_jobs=None):
     """Detect close relationships (e.g. trios and parent-child pairs) in a multisample VCF file.
     
     The input file should contain jointly called variants from two or more individuals.
@@ -605,11 +626,12 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
         notrio (bool): If True, skip trio analysis. (Default = False)
         percentiles (list): List of (integral) percentile ranks to be used in filtering. (Default = [10,30,50])
     """
-    
+
     log = None if prefix is None or prefix in ("", "STDOUT") else open('%s.log'%prefix, 'w')
     callGenders, callPairs, callTrios = not nogender, not nopairwise, not notrio
     ynG, ynP, ynT = ('YES' if b else 'NO' for b in (callGenders, callPairs, callTrios))
-    
+    n_cores = _default_n_jobs(n_jobs, multiprocessing.cpu_count())
+
     form = '{:>40} : {}'
     _writeout('VCFped %s\n'%__version__, log, quiet)
     _writeout('Options in effect:', log, quiet)
@@ -621,6 +643,7 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     _writeout(form.format('Trio thresholds', 'T1 (AA+BB=AB) [%d%%], T2 (BB+BB=BB) [%d%%]'%(T1_thresh,T2_thresh)), log, quiet)
     _writeout(form.format('Pairwise thresholds', 'MZ (IBS=2) [%d%%], PO (IBS>0) [%d%%]'%(MZ_thresh,PO_thresh)), log, quiet)
     _writeout(form.format('Gender thresholds', 'Male (Xhet) [<%d%%], female (Xhet) [>%d%%]' %(MALE_thresh, FEMALE_thresh)), log, quiet)
+    _writeout(form.format('Parallel processes', f'{n_cores} cores'), log, quiet)
     _writeout(form.format('Sample if approx. count exceeds', exactmax), log, quiet)
     _writeout(form.format('If sampling: Minimum # variants', samplesize), log, quiet)
     _writeout(form.format('If sampling: Minimum with AA and BB', samplesizeAABB), log, quiet)
@@ -628,7 +651,7 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     _writeout(form.format('Filtering percentile ranks', ' '.join(map(str, percentiles))), log, quiet)
     _writeout(form.format('Percentile selection', 'best of %d percentile(s) kept per pair/trio (more percentiles = more chances to cross a threshold)' % len(percentiles)), log, quiet)
     st = time.time()
-    
+
     # inspect file and guess various format details.
     info = inspectFile(file, log=log, quiet=quiet)
     nSamples = info['nSamples']
@@ -636,16 +659,16 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     linecount = info['linecount']
     chromcol = info['chromcol']
     firstSampleCol = info['formatcol'] + 1
-    
+
     badvars = [v for v in variables if v not in ['QUAL','DP','GQ','AD']]
     if badvars:
         raise RuntimeError("Unknown quality variables: %s." % ', '.join(badvars))
-    
+
     if linecount > exactmax:
         AUTOSOM, XCHR = sample_variants(file, maxsize=samplesize*2, AABBsize=samplesizeAABB, Xsize=100, info=info, log=log, quiet=quiet)
     else:
         AUTOSOM, XCHR = all_variants(file, info=info, log=log, quiet=quiet)
-    
+
     qualdist = qualityDistrib(AUTOSOM, info, variables) # fields = ['DP']
     qualityPercentile(qualdist, percentiles, log=log, quiet=quiet)
 
@@ -654,109 +677,120 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     triples = list(itertools.combinations(list(range(nSamples)), 3))
     pairs = list(itertools.combinations(list(range(nSamples)), 2))
 
-    # Define generators for pairs and triples
-    pairs_gen = lambda: itertools.combinations(range(nSamples), 2)
-    triples_gen = lambda: itertools.combinations(range(nSamples), 3)
-
     TRIORES, PAIRRES, GENDERRES = [], [], []
-    with multiprocessing.Pool(processes=16) as pool:  # Adjust number of processes as needed
+
+    with multiprocessing.Pool(processes=n_cores) as pool:
         for p in percentiles:
             qualperc = qualityPercentile(qualdist, p, log=None, quiet=True)
             filterargs = {key+'min':val for key,val in qualperc.items()}
             filterObject = Filter(formatinfo=info, PASS=True, **filterargs)
             filterFUN = filterObject.filter()
-            
+
             autosom_filt = {k:list(filter(filterFUN, v)) for k,v in autosom_filt.items()}
             x_filt = {k:list(filter(filterFUN, v)) for k,v in x_filt.items()}
-            
-            N = sum(len(v) for v in autosom_filt.values()) 
-            
+
+            N = sum(len(v) for v in autosom_filt.values())
+
             if N == 0: break
 
             #### GENDERS ###
             if not nogender:
                 genders = inferGenders(x_filt, info, percentile=p, FEMALE_thresh=FEMALE_thresh, MALE_thresh=MALE_thresh)
                 GENDERRES.extend(genders)
-                
+
             #### PAIRWISE ###
-            pbar = tqdm(total= nSamples * (nSamples - 1) // 2)
             if not nopairwise:
-                for pair_chunk in chunked_iterable(pairs_gen(), 10000):
-                    pair_args = [(autosom_filt, pair, p, MZ_thresh, PO_thresh) for pair in pair_chunk]
-                    PAIRRES.extend(pool.map(checkPair_worker, pair_args))
+                n_pairs = nSamples * (nSamples - 1) // 2
+                # Dynamic chunk size: aim for at least 100 chunks per core for load balancing
+                # Smaller chunks = better load distribution on 64 cores
+                pair_chunksize = max(1, min(50, n_pairs // (n_cores * 100)))
+
+                pbar = tqdm(total=n_pairs, desc=f"Pairs (p={p})", disable=quiet)
+                pair_args = [(autosom_filt, pair, p, MZ_thresh, PO_thresh) for pair in pairs]
+
+                # Use imap_unordered with small chunksize for dynamic load balancing
+                for result in pool.imap_unordered(checkPair_worker, pair_args, chunksize=pair_chunksize):
+                    PAIRRES.append(result)
                     pbar.update(1)
-                
+                pbar.close()
+
             #### TRIOS ###
-            pbar = tqdm(total= nSamples * (nSamples - 1) * (nSamples - 2) // 6)
             if not notrio:
-                for triple_chunk in chunked_iterable(triples_gen(), 10000):
-                    triple_args = [(autosom_filt, triple, p, T1_thresh, T2_thresh) for triple in triple_chunk]
-                    for res in pool.map(checkTriple_worker, triple_args):
-                        TRIORES.extend(res)
-                        pbar.update(1)
-    
+                n_trios = nSamples * (nSamples - 1) * (nSamples - 2) // 6
+                # Smaller chunks for trios (more computation per item)
+                trio_chunksize = max(1, min(20, n_trios // (n_cores * 100)))
+
+                pbar = tqdm(total=n_trios, desc=f"Trios (p={p})", disable=quiet)
+                triple_args = [(autosom_filt, triple, p, T1_thresh, T2_thresh) for triple in triples]
+
+                # Use imap_unordered for dynamic load balancing
+                for res in pool.imap_unordered(checkTriple_worker, triple_args, chunksize=trio_chunksize):
+                    TRIORES.extend(res)
+                    pbar.update(1)
+                pbar.close()
+
     GENDERRES.sort(key=lambda x: (x['sample'], x['percentile']))
     PAIRRES.sort(key=lambda x: (x['pair'], x['percentile']))
     TRIORES.sort(key=lambda x: (x['triple'], x['pivot'], x['percentile']))
-    
+
     # Most confident calls
     bestG = bestGenders(GENDERRES)
     bestP = bestPairs(PAIRRES, reportall=reportall)
     bestT = bestTrios(TRIORES, reportall=reportall)
-    
+
     _writeout('\nAll analysis finished.\nTime used: %.2f seconds' % (time.time()-st), log, quiet)
-    
+
     TEMP = "\n===={heading}====\n{table}\n\nMost confident {analysis} calls written to {outfile}"     
-    
+
     if not nogender:
-        
+
         outfile = "%s.gender" % prefix
-        
+
         # write all results to log (pretty-printed)
         complete = tabulate(gender_table(GENDERRES), tablefmt="plain") 
         _writeout(TEMP.format(heading="GENDERS", table=complete, analysis="gender", outfile=outfile), log, quiet=True)
-        
+
         # write most confident calls to screen, if not quiet (pretty-printed)
         best_pretty = tabulate(bestG, tablefmt="plain") 
         _writeout(TEMP.format(heading="GENDERS", table=best_pretty, analysis="gender", outfile=outfile), log=None, quiet=quiet)
-        
+
         # write most confident calls to separate file (tab separated!)
         best_tsv = '\n'.join('\t'.join(map(str, line)) for line in bestG)
         with open(outfile, 'w') as out:
-            out.write(best_tsv)   
-        
-    if not nopairwise:    
-        
+            out.write(best_tsv)
+
+    if not nopairwise:
+
         outfile = "%s.pair" % prefix
         # write all results to log (pretty-printed)
         complete = tabulate(pairwise_table(PAIRRES), tablefmt="plain") if PAIRRES else "Not enough individuals in the file"
         _writeout(TEMP.format(heading="PAIRWISE RELATIONS", table=complete, analysis="pairwise", outfile=outfile), log, quiet=True)
-        
+
         # write most confident calls to screen, if not quiet (pretty-printed)
         best_pretty = tabulate(bestP, tablefmt="plain") if PAIRRES else "Not enough individuals in the file"
         _writeout(TEMP.format(heading="PAIRWISE RELATIONS", table=best_pretty, analysis="pairwise", outfile=outfile), log=None, quiet=quiet)
-        
+
         # write most confident calls to separate file (tab separated!)
         best_tsv = '\n'.join('\t'.join(map(str, line)) for line in bestP)
         with open(outfile, 'w') as out:
             out.write(best_tsv)
-                   
+ 
     if not notrio:
         outfile = "%s.trio" % prefix
-        
+
         # write all results to log (pretty-printed)
         complete = tabulate(trio_table(TRIORES), tablefmt="plain") if TRIORES else "Not enough individuals in the file"
         _writeout(TEMP.format(heading="TRIO RELATIONS", table=complete, analysis="trio", outfile=outfile), log, quiet=True)
-        
+
         # write most confident calls to screen, if not quiet (pretty-printed)
         best_pretty = tabulate(bestT, tablefmt="plain") if TRIORES else "Not enough individuals in the file"
         _writeout(TEMP.format(heading="TRIO RELATIONS", table=best_pretty, analysis="trio", outfile=outfile), log=None, quiet=quiet)
-        
+
         # write most confident calls to separate file (tab separated!)
         best_tsv = '\n'.join('\t'.join(map(str, line)) for line in bestT)
         with open(outfile, 'w') as out:
-            out.write(best_tsv)        
-    
+            out.write(best_tsv)
+
     if pedfile:
         pedcomp = "OK"
         try:
@@ -764,24 +798,26 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
         except RuntimeError as e:
             pedcomp = "FAIL!\n%s" %e
         _writeout("\n====COMPARISON WITH PEDIGREE FILE====\n%s\n" % pedcomp, log, quiet=quiet)
-        
+
     if log:
-        log.close()  
-    
+        log.close()
+
     if pedfile:
         return pedcomp=="OK"
     else:
         return None
-        
-def main():    
+
+
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("file", help="path to VCF file")
     parser.add_argument("--quiet", help="do not print information on the screen", action='store_true')
     parser.add_argument('--version', action='version', version='VCFped %s'%__version__)
-    parser.add_argument("--no-gender", help="skip gender analysis", dest='nogender', action='store_true')
+    parser.add_argument("--no-gender", help="skip gender analysis (use for non-human samples or VCFs without X-linked variants)", dest='nogender', action='store_true')
     parser.add_argument("--no-pairwise", help="skip pairwise analysis", dest='nopairwise', action='store_true')
     parser.add_argument("--no-trio", help="skip trio analysis", dest='notrio', action='store_true')
     parser.add_argument("--all", help="show results for all pairs/triples (not only the inferred)", dest="reportall", action='store_true')
+    parser.add_argument("-j", "--jobs", dest="n_jobs", type=int, help="number of parallel processes (default: all cores, or 25%% of cores if >8 available)", default=None)
     parser.add_argument("-o", help="prefix for output files", dest="prefix")
     parser.add_argument("-ped", help="path to trio pedfile", dest="pedfile")
     parser.add_argument("-v", dest="variables", nargs='+', help="quality variables to be used for filtering", default=['QUAL', 'DP', 'GQ', 'AD'])
@@ -795,8 +831,8 @@ def main():
     parser.add_argument("-po", dest="PO_thresh", type=int, help="threshold (%%) for PO score (IBS>0 | either is BB)", default=99)
     parser.add_argument("-female", dest="FEMALE_thresh", type=int, help="lower limit (%%) for female heterozygosity on X", default=25)
     parser.add_argument("-male", dest="MALE_thresh", type=int, help="upper limit (%%) for male heterozygosity on X", default=5)
-    
-    args = parser.parse_args(sys.argv[1:])  
+
+    args = parser.parse_args(sys.argv[1:])
     if args.pedfile and args.notrio:
         parser.error("argument --no-trio: Trio analysis cannot be switched off when a pedfile is indicated.")
     if args.pedfile and args.nogender:
@@ -804,17 +840,17 @@ def main():
     for pp in args.percentiles:
         if not 0 <= pp < 100: parser.error("argument -p: invalid percentile: %d" %pp)
     thresh_error = "argument -%s/--%s: invalid threshold (must be in [0, 100]): %d"
-    if not 0<= args.T1_thresh <=100: parser.error(thresh_error % ('t1','T1_thresh', args.T1_thresh))
-    if not 0<= args.T2_thresh <=100: parser.error(thresh_error % ('t2','T2_thresh', args.T2_thresh))
-    if not 0<= args.MZ_thresh <=100: parser.error(thresh_error % ('mz','MZ_thresh', args.MZ_thresh))
-    if not 0<= args.PO_thresh <=100: parser.error(thresh_error % ('po','PO_thresh', args.PO_thresh))
-    if not 0<= args.FEMALE_thresh <=100: parser.error(thresh_error % ('female','FEMALE_thresh', args.FEMALE_thresh))
-    if not 0<= args.MALE_thresh <=100: parser.error(thresh_error % ('male','MALE_thresh', args.MALE_thresh))
-    if args.MALE_thresh > args.FEMALE_thresh: 
+    if not 0 <= args.T1_thresh <= 100: parser.error(thresh_error % ('t1','T1_thresh', args.T1_thresh))
+    if not 0 <= args.T2_thresh <= 100: parser.error(thresh_error % ('t2','T2_thresh', args.T2_thresh))
+    if not 0 <= args.MZ_thresh <= 100: parser.error(thresh_error % ('mz','MZ_thresh', args.MZ_thresh))
+    if not 0 <= args.PO_thresh <= 100: parser.error(thresh_error % ('po','PO_thresh', args.PO_thresh))
+    if not 0 <= args.FEMALE_thresh <= 100: parser.error(thresh_error % ('female','FEMALE_thresh', args.FEMALE_thresh))
+    if not 0 <= args.MALE_thresh <= 100: parser.error(thresh_error % ('male','MALE_thresh', args.MALE_thresh))
+    if args.MALE_thresh > args.FEMALE_thresh:
         parser.error("argument -male/--MALE_thresh: invalid threshold (must be below female threshold which is %d): %d" %(args.FEMALE_thresh, args.MALE_thresh))
-    
+
     if args.prefix is None: args.prefix = os.path.splitext(os.path.basename(args.file))[0]
     vcfped(**vars(args))
-    
+
 if __name__ == '__main__':
     main()
