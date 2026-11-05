@@ -49,6 +49,7 @@ import random
 import sys
 import os
 import argparse
+import math
 from tabulate import tabulate
 
 # CRITICAL: Disable threading to prevent oversubscription
@@ -57,6 +58,7 @@ os.environ['NUMBA_NUM_THREADS'] = '1'
 os.environ['OMP_NUM_THREADS'] = '1'
 os.environ['MKL_NUM_THREADS'] = '1'
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['VECLIB_MAXIMUM_THREADS'] = '1'
 
 import multiprocessing as mp
 from multiprocessing import Pool, cpu_count, shared_memory
@@ -98,7 +100,7 @@ _PAR1_ = (60000, 2699521)
 _PAR2_ = (154931043, 155270561)
 
 # Genotype mapping
-_GT2AB_ = {'0/0':'AA', '0|0':'AA', '0/1':'AB', '0|1':'AB', '1|0':'AB', '1/1':'BB', '1|1':'BB'}
+_GT2AB_ = {'0/0':'AA', '0|0':'AA', '0/1':'AB', '1/0':'AB', '0|1':'AB', '1|0':'AB', '1/1':'BB', '1|1':'BB'}
 _GT2NUM_ = {'AA': 0, 'AB': 1, 'BB': 2, '-': -1}
 _NUM2GT_ = {0: 'AA', 1: 'AB', 2: 'BB', -1: '-'}
 
@@ -730,6 +732,107 @@ def process_trios_batch(args):
     shm.close()
     return results
 
+# ---------------------------------------------------------------------------
+# Trio scoring by matrix products (--trio-method gemm)
+#
+# For parents a<b and child c, with AA/AB/BB/present as 0/1 indicator vectors
+# over sites:
+#   T1 total = sum_v (AA_a BB_b + BB_a AA_b) * present_c     T1 hits = same * AB_c
+#   T2 total = sum_v  BB_a BB_b * present_c                  T2 hits = same * BB_c
+# (a, b present is implied by AA/BB). For a fixed a, stacking over all b and c
+# turns these into four n x S x n matrix products, so the counts of EVERY triple
+# come out of BLAS instead of one Python/Numba loop per triple. Counts are small
+# integers, exactly representable in float32, so the results are identical to
+# calculate_trio_scores_batch(). Missing genotypes drop out through `present`
+# exactly as there (a site with a missing call in any of the three does not count).
+# ---------------------------------------------------------------------------
+
+_GEMM_CACHE = {}   # per worker process: indicator matrices of the current shared matrix
+
+
+def _gemm_indicators(shm_name, gt):
+    """Float32 indicator matrices for a genotype matrix, cached per worker."""
+    cached = _GEMM_CACHE.get('entry')
+    if cached is not None and cached[0] == shm_name:
+        return cached[1]
+    S, n = gt.shape
+    present = (gt >= 0).astype(np.float32)
+    P1 = np.concatenate([present, (gt == 1).astype(np.float32)], axis=1)   # [present | AB]
+    P2 = np.concatenate([present, (gt == 2).astype(np.float32)], axis=1)   # [present | BB]
+    AA = (gt == 0).astype(np.float32)
+    mats = (AA, P1, P2)
+    _GEMM_CACHE['entry'] = (shm_name, mats)
+    return mats
+
+
+def process_trios_gemm(args):
+    """
+    Worker: all triples whose lowest-ranked parent index `a` is in a_list, with
+    every other sample as pivot/child. Returns result dicts in the same shape as
+    process_trios_batch().
+
+    Without reportall only rows that can influence the final selection are
+    returned: a row with T1 below T1_thresh - 0.06 (and therefore a verdict of
+    'Not trio' or 'na') can never beat a Regular/Inverted row of its triple, and
+    triples without such a row are not written. The 0.06 margin covers the
+    1-decimal ranking and 2-decimal rounding. With reportall every row is returned.
+    """
+    shm_name, shape, dtype, a_list, percentile, T1_thresh, T2_thresh, reportall = args
+    shm = shared_memory.SharedMemory(name=shm_name)
+    gt = np.ndarray(shape, dtype=dtype, buffer=shm.buf)
+    S, n = shape
+    AA, P1, P2 = _gemm_indicators(shm_name, gt)
+    BB = P2[:, n:]
+    results = []
+
+    for a in a_list:
+        if a >= n - 1:
+            continue
+        AAa, BBa = AA[:, a:a + 1], BB[:, a:a + 1]
+        X = AAa * BB[:, a + 1:] + BBa * AA[:, a + 1:]        # S x nb  (b > a)
+        Y = BBa * BB[:, a + 1:]
+        R1 = X.T @ P1                                         # nb x 2n: [T1 total | T1 hits]
+        R2 = Y.T @ P2                                         # nb x 2n: [T2 total | T2 hits]
+        t1_tot = np.rint(R1[:, :n]).astype(np.int32)
+        t1_hit = np.rint(R1[:, n:]).astype(np.int32)
+        t2_tot = np.rint(R2[:, :n]).astype(np.int32)
+        t2_hit = np.rint(R2[:, n:]).astype(np.int32)
+
+        nb = n - a - 1
+        valid = np.ones((nb, n), dtype=bool)
+        rows = np.arange(nb)
+        valid[rows, a] = False                                # child is not parent a
+        valid[rows, a + 1 + rows] = False                     # ... nor parent b
+        if reportall:
+            ii, cc = np.nonzero(valid)
+        else:
+            ii, cc = np.nonzero(valid & (t1_tot >= 100))
+            ratio = 100.0 * t1_hit[ii, cc] / t1_tot[ii, cc]
+            keep = ratio >= T1_thresh - 0.06
+            ii, cc = ii[keep], cc[keep]
+
+        for i, c in zip(ii.tolist(), cc.tolist()):
+            b = a + 1 + i
+            # numpy int32 scalars on purpose: same arithmetic/rounding as process_trios_batch()
+            h1, n1, h2, n2 = t1_hit[i, c], t1_tot[i, c], t2_hit[i, c], t2_tot[i, c]
+            AA_BB_ABp = round(100.0 * h1 / n1, 2) if n1 > 0 else 0
+            BB_BB_BBp = round(100.0 * h2 / n2, 2) if n2 > 0 else 0
+            if n1 >= 100:
+                if AA_BB_ABp >= T1_thresh:
+                    verdict = 'Regular trio' if BB_BB_BBp >= T2_thresh else 'Inverted/generational trio'
+                else:
+                    verdict = 'Not trio'
+            else:
+                verdict = 'na'
+            results.append(dict(
+                triple=tuple(sorted((a, b, c))), order=None, pivot=c, percentile=percentile,
+                verdict=verdict, autos=S, tot_AA_BB=int(n1), AA_BB_AB=int(h1),
+                AA_BB_ABp=float(AA_BB_ABp), tot_BB_BB=int(n2), BB_BB_BB=int(h2),
+                BB_BB_BBp=float(BB_BB_BBp)))
+
+    shm.close()
+    return results
+
 def inferGenders(XCHRfilt, formatinfo, percentile, FEMALE_thresh, MALE_thresh):
     """Unchanged from original"""
     nSamples = formatinfo['nSamples']
@@ -1151,7 +1254,7 @@ def _iter_trio_rows(conn):
                    tot_BB_BB=tot_BB_BB, BB_BB_BB=BB_BB_BB, BB_BB_BBp=BB_BB_BBp, verdict=verdict)
 
 
-def _stream_complete_pairs_to_log(conn, log, outfile, has_data):
+def _stream_complete_pairs_to_log(conn, log, outfile, has_data, full=True):
     """
     Write every stored pair result to the log file as plain TSV, streaming
     row-by-row instead of building one tabulate()-aligned string in memory.
@@ -1162,8 +1265,11 @@ def _stream_complete_pairs_to_log(conn, log, outfile, has_data):
     """
     if not log:
         return
-    print("\n====PAIRWISE RELATIONS====", file=log)
-    if not has_data:
+    if full:
+        print("\n====PAIRWISE RELATIONS====", file=log)
+    if not full:
+        pass
+    elif not has_data:
         print("Not enough individuals in the file", file=log)
     else:
         print('\t'.join(['Pair', 'Perc', 'Autos', 'NeitherAA', 'IBS2', 'MZscore',
@@ -1177,12 +1283,15 @@ def _stream_complete_pairs_to_log(conn, log, outfile, has_data):
     print(f"\nMost confident pairwise calls written to {outfile}", file=log)
 
 
-def _stream_complete_trios_to_log(conn, log, outfile, has_data):
+def _stream_complete_trios_to_log(conn, log, outfile, has_data, full=True):
     """Trio counterpart of _stream_complete_pairs_to_log() — see that docstring."""
     if not log:
         return
-    print("\n====TRIO RELATIONS====", file=log)
-    if not has_data:
+    if full:
+        print("\n====TRIO RELATIONS====", file=log)
+    if not full:
+        pass
+    elif not has_data:
         print("Not enough individuals in the file", file=log)
     else:
         print('\t'.join(['Triple', 'Pivot', 'Perc', 'Autos', 'AA+BB', '=AB', 'Test1',
@@ -1258,7 +1367,7 @@ def _stream_and_write_best_trios(conn, reportall, outfile, quiet, has_data):
 def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP','GQ','AD'], percentiles=[10,30,50],
            T1_thresh=90, T2_thresh=95, MZ_thresh=95, PO_thresh=99, MALE_thresh=5, FEMALE_thresh=25, pedfile=None,
            nogender=False, nopairwise=False, notrio=False, exactmax=150000, samplesize=10000, samplesizeAABB=500,
-           n_jobs=None, batch_size=None, max_trio_batches=None):
+           n_jobs=None, batch_size=None, max_trio_batches=None, trio_method='numba', full_log=False):
     """
     Optimized VCF relationship detection for large datasets.
 
@@ -1269,6 +1378,11 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
         batch_size (int): Number of pairs/trios per batch. Default: auto-calculated
         max_trio_batches (int): Max number of trio batches to process (None = all).
                                 Set this to limit memory for huge datasets.
+        trio_method (str): 'numba' (one kernel call per triple, default) or 'gemm'
+            (all triples by matrix products; identical .trio output, much faster
+            for large cohorts, never materializes the list of triples).
+        full_log (bool): also write every stored pair/trio result to the .log
+            (can be gigabytes at cohort scale; default: off).
     """
     
     log = None if prefix is None or prefix in ("", "STDOUT") else open('%s.log'%prefix, 'w')
@@ -1297,6 +1411,8 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     _writeout(form.format('If sampling: Minimum with AA and BB', samplesizeAABB), log, quiet)
     _writeout(form.format('Filtering variables', ' '.join(variables)), log, quiet)
     _writeout(form.format('Filtering percentile ranks', ' '.join(map(str, percentiles))), log, quiet)
+    _writeout(form.format('Trio method', trio_method + (' (matrix products)' if trio_method == 'gemm' else ' (Numba kernel per triple)')), log, quiet)
+    _writeout(form.format('Full log', 'complete pair/trio tables written to the log' if full_log else 'off (use --full-log for the complete pair/trio tables)'), log, quiet)
     _writeout(form.format('Percentile selection', 'best of %d percentile(s) kept per pair/trio (more percentiles = more chances to cross a threshold)' % len(percentiles)), log, quiet)
     st = time.time()
     
@@ -1321,11 +1437,13 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
     x_filt = XCHR.copy()
     
     pairs = list(itertools.combinations(range(nSamples), 2))
-    triples = list(itertools.combinations(range(nSamples), 3))
+    n_triples = math.comb(nSamples, 3)
+    # The explicit list only exists for the Numba path; at cohort scale it would not fit in memory.
+    triples = list(itertools.combinations(range(nSamples), 3)) if (callTrios and trio_method == 'numba') else []
     
     _writeout(f"\nDataset size: {nSamples} samples", log, quiet)
     _writeout(f"  Pairs to analyze: {len(pairs):,}", log, quiet)
-    _writeout(f"  Trios to analyze: {len(triples):,}", log, quiet)
+    _writeout(f"  Trios to analyze: {n_triples:,}", log, quiet)
     
     # Calculate optimal batch sizes for process-level parallelism
     # Key: Larger batches reduce inter-process communication overhead
@@ -1342,11 +1460,11 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
             pair_batch_size = 1000
 
         # For trios: Adjust based on dataset size
-        if len(triples) > 0:
-            if len(triples) < 1000000:
-                trio_batch_size = max(500, min(5000, len(triples) // (n_jobs * batches_per_core)))
+        if n_triples > 0:
+            if n_triples < 1000000:
+                trio_batch_size = max(500, min(5000, n_triples // (n_jobs * batches_per_core)))
             else:
-                trio_batch_size = max(1000, min(10000, len(triples) // (n_jobs * batches_per_core)))
+                trio_batch_size = max(1000, min(10000, n_triples // (n_jobs * batches_per_core)))
         else:
             trio_batch_size = 500
     else:
@@ -1354,7 +1472,7 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
         trio_batch_size = batch_size
     
     _writeout(f"Batch sizes (for load balancing): pairs={pair_batch_size}, trios={trio_batch_size}", log, quiet=True)
-    _writeout(f"  Estimated batches: pairs={len(pairs)//pair_batch_size}, trios={len(triples)//trio_batch_size if callTrios else 0}", log, quiet=True)
+    _writeout(f"  Estimated batches: pairs={len(pairs)//pair_batch_size}, trios={n_triples//trio_batch_size if callTrios else 0}", log, quiet=True)
     
     # Online best-tracking, backed by a scratch SQLite DB (see comment above
     # _open_results_db()) instead of in-memory dicts.
@@ -1438,7 +1556,29 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
                         _writeout(f"  Pair analysis completed in {pair_time:.1f}s ({len(pairs)/pair_time:.0f} pairs/sec)", log, quiet=True)
                     
                     # Trio analysis with batch processing
-                    if callTrios:
+                    if callTrios and trio_method == 'gemm':
+                        trio_start = time.time()
+                        # Parent index `a` carries n-a-1 parents b and n children c: interleave
+                        # the a values over many tasks so every task has a similar cost.
+                        n_tasks = max(1, min(nSamples, n_jobs * 8))
+                        gemm_args = [
+                            (shm.name, gt_matrix.shape, gt_matrix.dtype, list(range(k, nSamples, n_tasks)),
+                             p, T1_thresh, T2_thresh, reportall)
+                            for k in range(n_tasks)
+                        ]
+                        _writeout(f"  Scoring {n_triples:,} trios by matrix products in {len(gemm_args)} tasks...", log, quiet)
+                        if TQDM_AVAILABLE and not quiet:
+                            pbar = tqdm(total=len(gemm_args), desc=f"Trio tasks (p={p})")
+                        for batch_results in pool.imap_unordered(process_trios_gemm, gemm_args):
+                            _upsert_trios(conn, batch_results)
+                            if TQDM_AVAILABLE and not quiet:
+                                pbar.update(1)
+                        if TQDM_AVAILABLE and not quiet:
+                            pbar.close()
+                        trio_time = time.time() - trio_start
+                        _writeout(f"  Trio analysis completed in {trio_time:.1f}s ({n_triples/trio_time:.0f} trios/sec)", log, quiet=True)
+
+                    elif callTrios:
                         trio_start = time.time()
                         
                         # For very large trio sets, optionally limit the number of batches
@@ -1560,7 +1700,7 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
         # "Complete" (unfiltered) dump streams directly to the log file
         # instead of going through tabulate() — see _stream_complete_pairs_to_log().
         # Runs LAST, after the useful output already exists on disk.
-        _stream_complete_pairs_to_log(conn, log, outfile, has_data=bool(n_pairs_stored))
+        _stream_complete_pairs_to_log(conn, log, outfile, has_data=bool(n_pairs_stored), full=full_log)
 
     if callTrios:
         outfile = "%s.trio" % prefix
@@ -1575,7 +1715,7 @@ def vcfped(file, quiet=True, reportall=False, prefix=None, variables=['QUAL','DP
         # "Complete" (unfiltered) dump streams directly to the log file
         # instead of going through tabulate() — see _stream_complete_trios_to_log().
         # Runs LAST, after the useful output already exists on disk.
-        _stream_complete_trios_to_log(conn, log, outfile, has_data=bool(n_trios_stored))
+        _stream_complete_trios_to_log(conn, log, outfile, has_data=bool(n_trios_stored), full=full_log)
 
     if pedfile:
         # checkped() needs list/zip semantics; this path only ever runs on
@@ -1618,6 +1758,12 @@ def main():
     parser.add_argument("-j", "--jobs", dest="n_jobs", type=int, help="number of parallel processes (default: all cores, or 25%% of cores if >8 available)", default=None)
     parser.add_argument("--batch-size", dest="batch_size", type=int, help="batch size for processing (default: auto)", default=None)
     parser.add_argument("--max-trio-batches", dest="max_trio_batches", type=int, help="max trio batches to limit memory (default: unlimited)", default=None)
+    parser.add_argument("--trio-method", dest="trio_method", choices=['numba', 'gemm'], default='numba',
+                        help="how trios are scored: 'numba' (default; one kernel call per triple) or 'gemm' "
+                             "(all triples via matrix products; identical .trio output, far faster for large cohorts; "
+                             "ignores --max-trio-batches)")
+    parser.add_argument("--full-log", dest="full_log", action='store_true',
+                        help="also write every stored pair/trio result to the .log (can be gigabytes at cohort scale)")
     parser.add_argument("-o", help="prefix for output files", dest="prefix")
     parser.add_argument("-ped", help="path to trio pedfile", dest="pedfile")
     parser.add_argument("-v", dest="variables", nargs='+', help="quality variables to be used for filtering", default=['QUAL', 'DP', 'GQ', 'AD'])

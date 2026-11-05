@@ -58,6 +58,8 @@ Install everything with conda/mamba: `conda env create -f environment.yml && con
 | Stores full variant lines | Yes | No (count-based genotype matrix + online best-tracking) |
 | gzip (.vcf.gz) support | No | Yes |
 | Thread env vars set | No | Yes (`OMP_NUM_THREADS` etc. forced to 1 to avoid oversubscription) |
+| Trio scoring | per-triple Python loop | `--trio-method numba` (default) or `gemm` (matrix products, exact) |
+| Complete pair/trio tables in `.log` | always | only with `--full-log` |
 
 Both scripts correctly handle missing genotypes (`-1`/`'-'`) by excluding them only from the
 per-pair / per-trio counts that involve them, never by dropping a variant globally just
@@ -121,14 +123,51 @@ Fixed:
   Guarded by `test_every_pass_record_is_analysed` (synthetic file with a known record count; the
   bundled VCF cannot catch this).
 
+- **Unphased `1/0` was read as a missing genotype** (*verified*, found while testing `--trio-method gemm`):
+  `_GT2AB_` only knew `0/1` and the phased `0|1`/`1|0`, so heterozygotes written `1/0` silently dropped
+  out of every pair/trio count (not from the X-chromosome het check, which already listed `1/0`). Now
+  `1/0` is `AB` in both engines. Guarded by `test_unphased_1_0_is_heterozygous`.
+
 - **`all_variants()` kept non-PASS records** (*verified*, found while checking; not in `IDEAS.md`).
   The filter `'\t.\t' in line` was meant to accept FILTER=`.` but also matched an ID or INFO of `.`,
   so e.g. a `LowQual` record with ID `.` passed (and `sample_variants()` accepted only `PASS`). Now the
   FILTER column must be `PASS` or `.` (substring fallback only for non-standard layouts). Guarded by
   `test_non_pass_records_are_excluded`.
 
-Other `IDEAS.md` items (genotype-level DP/GQ mask and per-sample QC block, candidate-parent
-approach for the cubic trio cost, trio pre-pruning, matrix formulation) are not implemented.
+Implemented from `IDEAS.md`: the matrix formulation (`--trio-method gemm`) and the opt-in full log
+(`--full-log`), see "Scaling the trio stage" below. Not implemented: genotype-level DP/GQ mask and
+per-sample QC block (first measure `Autos` per `Perc` in your own `.trio`), candidate-parent approach
+and trio pre-pruning (the matrix method is exact and fast enough; pre-pruning would be a heuristic —
+pair-level IBS0 does not bound T1, which only counts sites where the two parents are opposite
+homozygotes, and the PO 99 / T1 90 thresholds are not equivalent).
+
+### Scaling the trio stage: `--trio-method gemm` and `--full-log`
+
+`--trio-method numba` (default) runs one kernel call per triple and pivot (~22 µs at 3000 sites per
+triple-order on one core), so cost is n³ with a large constant. `--trio-method gemm` computes the same
+four counts for every triple with BLAS: for parents a<b and child c, T1 total = Σ_v (AA_a·BB_b +
+BB_a·AA_b)·present_c, T1 hits = same·AB_c, T2 total = Σ BB_a·BB_b·present_c, T2 hits = same·BB_c, so for a
+fixed a the counts of all (b, c) are four S×n matrix products (`process_trios_gemm()`, work interleaved
+over `a` across the process pool). Counts are small integers, exact in float32. It never materializes the
+list of triples (the numba path needs it) and stores only rows that can reach the output: without `--all`,
+rows with T1 < `-t1` − 0.06 are dropped in the worker (a `Not trio`/`na` row cannot beat a
+Regular/Inverted row of its triple; the margin covers the 1-decimal ranking and 2-decimal rounding), with
+`--all` every row is kept (small cohorts only). Rounding uses numpy int32 scalars on purpose so it is
+bit-identical to `process_trios_batch()`.
+
+*Verified:* `.trio` byte-identical to the numba path on the bundled trio, on a 75-sample family subset of
+`breeding_sim` (default, `--all`, `-p 0 5 20 40 70 -t1 70 -t2 50`), on a synthetic cohort with
+Regular/Inverted/Not trio/na verdicts and missing calls (`test_gemm_trio_method_matches_numba`), and on
+the full 500-sample `breeding_sim` (20.7 M triples, three percentiles). *Speed* (M1 Pro, `-j 10`, 3000
+sites, same run): numba 424-449 s per percentile (~47 k triples/s, dominated by per-triple Python
+overhead), gemm 1.5-3.1 s per percentile (whole run 8.8 s), i.e. ~150x faster. Extrapolated by n³, not
+measured: 3577 samples ≈ 15 min per percentile with gemm versus ≈ 45 h with numba. Memory per worker is five S×n float32
+matrices (S=3000, n=3577: ~215 MB); for very large S this is the limit.
+
+`--full-log` (off by default, both modes) writes every stored pair/trio result (`best_pairs`/`best_trios`,
+one row per pair / per triple×pivot) to the `.log`. At cohort scale that is gigabytes (37.9 M rows,
+2.1 GB for 424 samples in `IDEAS.md`) and nothing downstream reads it; `.pair`/`.trio` and the sample
+list in the log header are unaffected. `--max-trio-batches` only applies to the numba path.
 
 ## Build and run
 
@@ -849,7 +888,7 @@ Structure (`tests/`):
 | File | Covers |
 |---|---|
 | `conftest.py` | Shared fixtures: bundled test VCF/PED, `vcfped_run` (pre-built vcfped output), dynamic module loader for the `utilities/` scripts (not an importable package) |
-| `test_vcfped_core.py` | Both engines (`vcfped.py` and the archived original) against the bundled HG002/HG003/HG004 trio: known pedigree confirmation, exact `.pair`/`.trio` values, byte-identical cross-engine output, gzip input, CLI flags, every PASS record analysed in plain and `.vcf.gz` input (synthetic file with a known record count — regression guard for the dropped-first-record bug), log states "best of k percentile(s)", non-PASS records excluded |
+| `test_vcfped_core.py` | Both engines (`vcfped.py` and the archived original) against the bundled HG002/HG003/HG004 trio; `--trio-method gemm` byte-identical to numba (bundled trio, synthetic cohort with all verdicts and missing calls, `--all`, several percentiles); `--full-log` opt-in: known pedigree confirmation, exact `.pair`/`.trio` values, byte-identical cross-engine output, gzip input, CLI flags, every PASS record analysed in plain and `.vcf.gz` input (synthetic file with a known record count — regression guard for the dropped-first-record bug), log states "best of k percentile(s)", non-PASS records excluded |
 | `test_checkped.py` | PED file parsing and trio validation |
 | `test_purge_mz_twins.py` | MZ-twin grouping (transitive closure), VCF column purging, end-to-end detection+purge on a synthetic duplicate-sample VCF, heterozygosity guard (per-sample het incl. missing/phased calls, ratio filter boundaries, selfed child kept vs clone purged, `--min-het-ratio 0`) |
 | `test_filter_trios.py` | `best`/`strict`/`consensus` strategies, single-header-no-duplication regression |

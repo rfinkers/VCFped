@@ -260,3 +260,125 @@ def test_t2_threshold_controls_inverted_label(work_dir, test_vcf, engine):
 
     assert verdict('100') == ['Inverted/generational trio']
     assert verdict('0') == ['Regular trio']
+
+
+# ---------------------------------------------------------------------------
+# --trio-method gemm (matrix products) must reproduce the Numba path exactly
+# ---------------------------------------------------------------------------
+
+def _pedigree_vcf(path, n_sites=1400, seed=7):
+    """Small cohort with real trios, an unrelated sample, a sample with random
+    genotyping errors and one with many missing calls, so that Regular,
+    Inverted, Not trio and na verdicts all occur."""
+    import random
+    rnd = random.Random(seed)
+    names = ['F1', 'F2', 'F3', 'F4', 'K1', 'K2', 'K3', 'U1', 'U2', 'ERR', 'MISS']
+    rows = []
+    for i in range(n_sites):
+        g = {}
+        for f in ('F1', 'F2', 'F3', 'F4', 'U1', 'U2'):
+            g[f] = (rnd.random() < 0.5, rnd.random() < 0.5)       # two alleles (True = ALT)
+        def child(a, b):
+            return (g[a][rnd.randrange(2)], g[b][rnd.randrange(2)])
+        g['K1'] = child('F1', 'F2')
+        g['K2'] = child('F3', 'F4')
+        g['K3'] = child('K1', 'F3')
+        g['ERR'] = child('F1', 'F4') if rnd.random() > 0.2 else (rnd.random() < 0.5, rnd.random() < 0.5)
+        g['MISS'] = child('F2', 'F3')
+        cols = []
+        for n in names:
+            a, b = g[n]
+            gt = '%d/%d' % tuple(sorted((a, b)))     # vcfped reads unphased 0/1 only, not 1/0
+            if n == 'MISS' and rnd.random() < 0.4:
+                gt = './.'
+            cols.append(f"{gt}:30:50")
+        rows.append(f"1\t{100 + i}\t.\tA\tG\t50\tPASS\t.\tGT:DP:GQ\t" + "\t".join(cols) + "\n")
+    with open(path, 'w') as f:
+        f.write("##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t"
+                + "\t".join(names) + "\n" + "".join(rows))
+    return path
+
+
+@pytest.mark.parametrize('extra', [[], ['--all'], ['-p', '0', '30', '60', '-t1', '75', '-t2', '40']])
+def test_gemm_trio_method_matches_numba(work_dir, extra):
+    _skip_optimized_without_numpy('vcfped.vcfped')
+    vcf = _pedigree_vcf(os.path.join(work_dir, 'ped.vcf'))
+    out = {}
+    for method in ('numba', 'gemm'):
+        prefix = os.path.join(work_dir, f'out_{method}')
+        result = run_module(['vcfped.vcfped', vcf, '-o', prefix, '-j', '2', '--quiet',
+                             '--no-gender', '--no-pairwise', '--trio-method', method] + extra)
+        assert result.returncode == 0, result.stderr
+        with open(f"{prefix}.trio", 'rb') as f:
+            out[method] = f.read()
+    assert out['gemm'] == out['numba']
+    text = out['gemm'].decode()
+    assert 'Regular trio' in text or 'Inverted/generational trio' in text   # the test is not vacuous
+    if '--all' in extra:
+        assert 'Not trio' in text and '\tna' in text
+
+
+def test_gemm_trio_method_matches_numba_on_bundled_trio(work_dir, test_vcf):
+    _skip_optimized_without_numpy('vcfped.vcfped')
+    out = {}
+    for method in ('numba', 'gemm'):
+        prefix = os.path.join(work_dir, f'hg_{method}')
+        result = run_module(['vcfped.vcfped', test_vcf, '-o', prefix, '-j', '2', '--quiet',
+                             '--trio-method', method])
+        assert result.returncode == 0, result.stderr
+        with open(f"{prefix}.trio", 'rb') as f:
+            out[method] = f.read()
+    assert out['gemm'] == out['numba']
+    assert b'1,2,3\t1\t10\t1906\t136\t136\t100.0\t269\t267\t99.3\tRegular trio' in out['gemm']
+
+
+def test_full_log_is_opt_in(work_dir, test_vcf):
+    _skip_optimized_without_numpy('vcfped.vcfped')
+    logs = {}
+    for flag, tag in (([], 'default'), (['--full-log'], 'full')):
+        prefix = os.path.join(work_dir, f'log_{tag}')
+        result = run_module(['vcfped.vcfped', test_vcf, '-o', prefix, '-j', '1', '--quiet'] + flag)
+        assert result.returncode == 0, result.stderr
+        with open(f"{prefix}.log") as f:
+            logs[tag] = f.read()
+    for section in ('====PAIRWISE RELATIONS====', '====TRIO RELATIONS===='):
+        assert section not in logs['default']
+        assert section in logs['full']
+    # the pointer to the result files is kept either way
+    assert 'Most confident trio calls written to' in logs['default']
+    assert 'Most confident pairwise calls written to' in logs['default']
+
+
+@pytest.mark.parametrize('engine', ENGINES)
+def test_unphased_1_0_is_heterozygous(work_dir, engine):
+    """
+    A heterozygous call written 1/0 must give the same result as 0/1. Currently
+    was silently treated as missing, so every pair/trio count that involves it
+    shrank (the VCF spec allows either allele order).
+    """
+    _skip_optimized_without_numpy(engine)
+    header = ("##fileformat=VCFv4.2\n"
+              "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1\ts2\ts3\n")
+    # s1 and s2 share every genotype (so MZ-like); s3 differs. Hets in s1/s2 are the point.
+    pattern = [('0/1', '0/1', '0/0'), ('1/1', '1/1', '0/1'), ('0/1', '0/1', '1/1'),
+               ('0/0', '0/0', '0/1'), ('0/1', '0/1', '0/1'), ('1/1', '1/1', '0/0')] * 4
+
+    def write(path, het):
+        rows = "".join(
+            "1\t%d\t.\tA\tG\t50\tPASS\t.\tGT:DP:GQ\t%s\n" % (
+                100 + i, "\t".join(f"{g.replace('0/1', het)}:30:50" for g in gts))
+            for i, gts in enumerate(pattern))
+        with open(path, 'w') as f:
+            f.write(header + rows)
+
+    result_text = {}
+    for het in ('0/1', '1/0'):
+        vcf = os.path.join(work_dir, f"het_{het.replace('/', '')}.vcf")
+        write(vcf, het)
+        prefix = os.path.join(work_dir, f"out_{het.replace('/', '')}")
+        result = run_module([engine, vcf, '-o', prefix, '-j', '1', '--quiet', '--no-gender',
+                             '--no-trio', '--all'])
+        assert result.returncode == 0, result.stderr
+        with open(f"{prefix}.pair") as f:
+            result_text[het] = f.read()
+    assert result_text['1/0'] == result_text['0/1']

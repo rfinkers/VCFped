@@ -161,7 +161,7 @@ def inspectFile(filename, log, quiet=False):
                 formatfields=formatfields, DPind=DPind, GQind=GQind, ADind=ADind, counttype=counttype, available_vars=available_vars,
                 linecount=linecount, samples=samples, nSamples=nSamples, startpos=startpos, endpos=endpos)
 
-_GT2AB_ = {'0/0':'AA', '0|0':'AA', '0/1':'AB', '0|1':'AB', '1|0':'AB', '1/1':'BB', '1|1':'BB'}                
+_GT2AB_ = {'0/0':'AA', '0|0':'AA', '0/1':'AB', '1/0':'AB', '0|1':'AB', '1|0':'AB', '1/1':'BB', '1|1':'BB'}                
 
 
 def getGTtuple(linesplit, firstSampleCol):
